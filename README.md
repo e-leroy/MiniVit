@@ -19,7 +19,8 @@ Pré-requis et installation
 - PHP 5.3+ avec support JSON
 
 - envoyez le fichier "index.php" par FTP, SFTP ou tout autre moyen
-Alternative avec git:
+
+> Alternative avec git:
 - git clone https://github.com/rtsinfo/MiniVit
 
 - si le fichier "admin.php" n'existe pas, le script vous affichera qu'il faut le créer avec le contenu donné
@@ -32,5 +33,5 @@ Mise à jour
 
 - remplacez "index.php" par la nouvelle version
 
-Alternative avec git:
+> lternative avec git:
 - git pull origin master
