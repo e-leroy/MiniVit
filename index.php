@@ -10,9 +10,11 @@ $admin=array(
 
 MiniVit est un logiciel libre initialement développé par RTS INFORMATIQUE (www.rts-informatique.fr) et publié sous la licence CeCILL-B v1:
  http://www.cecill.info/licences/Licence_CeCILL-B_V1-fr.html
+Son code sur Github est compatible BSD v2.
 
 MiniVit is Free/Libre Software (free as in free speech) initially developed by RTS INFORMATIQUE (www.rts-informatique.fr) and published under the CeCILL-B v1 license:
  http://www.cecill.info/licences/Licence_CeCILL-B_V1-en.html
+It's code on Github is BSD v2 compliant.
 
 */
 
