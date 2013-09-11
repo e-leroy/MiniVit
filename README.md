@@ -33,5 +33,5 @@ Mise à jour
 
 - remplacez "index.php" par la nouvelle version
 
-> lternative avec git:
+> Alternative avec git:
 - git pull origin master
