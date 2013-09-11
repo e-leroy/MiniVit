@@ -1,25 +1,15 @@
 <?php 
 
 // ***  configuration de l'adresse IP de l'administrateur ***
-$admin=array(
-'123.123.123.123',
-);
-// -------------------------------------------------------
-// *******************************************************
-/*   LICENCE / LICENSE
-
-MiniVit est un logiciel libre initialement développé par RTS INFORMATIQUE (www.rts-informatique.fr) et publié sous la licence CeCILL-B v1:
- http://www.cecill.info/licences/Licence_CeCILL-B_V1-fr.html
-Son code sur Github est compatible BSD v2.
-
-MiniVit is Free/Libre Software (free as in free speech) initially developed by RTS INFORMATIQUE (www.rts-informatique.fr) and published under the CeCILL-B v1 license:
- http://www.cecill.info/licences/Licence_CeCILL-B_V1-en.html
-It's code on Github is BSD v2 compliant.
-
-*/
+$admin=FALSE;
+if(file_exists('./admin.php'))
+ require_once('./admin.php');
+else
+ die('L\'adresse IP de l\'administrateur n\'a pas été configurée: veuillez créer un fichier "admin.php" dans le dossier courant, contenant:<br><br><pre>&lt;?php
+ $admin=array("'.$_SERVER['REMOTE_ADDR'].'");
+?&gt;</pre>');
 
 // vérification de l'accès administrateur
-if(in_array('123.123.123.123', $admin)) die('L\'adresse IP de l\'administrateur n\'a pas été configurée. Votre IP actuelle: '.$_SERVER['REMOTE_ADDR']);
 if(in_array($_SERVER['REMOTE_ADDR'], $admin))
  $isadmin = TRUE;
 else $isadmin = FALSE;
