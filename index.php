@@ -1,0 +1,379 @@
+<?php 
+
+// ***  configuration de l'adresse IP de l'administrateur ***
+$admin=array(
+'123.123.123.123',
+);
+// -------------------------------------------------------
+// *******************************************************
+/*   LICENCE / LICENSE
+
+MiniVit est un logiciel libre initialement développé par RTS INFORMATIQUE (www.rts-informatique.fr) et publié sous la licence CeCILL-B v1:
+ http://www.cecill.info/licences/Licence_CeCILL-B_V1-fr.html
+
+MiniVit is Free/Libre Software (free as in free speech) initially developed by RTS INFORMATIQUE (www.rts-informatique.fr) and published under the CeCILL-B v1 license:
+ http://www.cecill.info/licences/Licence_CeCILL-B_V1-en.html
+
+*/
+
+// vérification de l'accès administrateur
+if(in_array('123.123.123.123', $admin)) die('L\'adresse IP de l\'administrateur n\'a pas été configurée. Votre IP actuelle: '.$_SERVER['REMOTE_ADDR']);
+if(in_array($_SERVER['REMOTE_ADDR'], $admin))
+ $isadmin = TRUE;
+else $isadmin = FALSE;
+
+// chiffrement
+$iv=substr(base64_encode(hash('sha256', $admin['0'])), 0, 16);
+
+function email_chiffrement($email, $ip, $iv) {
+ return openssl_encrypt($email, 'AES-256-CBC', $ip, FALSE, $iv);
+}
+
+function email_dechiffrement($string, $ip, $iv) {
+ return openssl_decrypt($string, 'AES-256-CBC', $ip, FALSE, $iv);
+}
+
+// détection basique d'appareils mobiles
+function isMobile() 
+{   
+    if(preg_match('/(alcatel|amoi|android|avantgo|blackberry|benq|cell|cricket|docomo|elaine|htc|iemobile|iphone|ipad|ipaq|ipod|j2me|java|midp|mini|mmp|mobi|motorola|nec-|nokia|palm|panasonic|philips|phone|sagem|sharp|sie-|smartphone|sony|symbian|t-mobile|telus|up\.browser|up\.link|vodafone|wap|webos|wireless|xda|xoom|zte)/i', $_SERVER['HTTP_USER_AGENT']))
+    return true;
+else
+    return false;
+}
+
+// initialisation de la configuration; valeurs par défaut
+$panneau_admin = FALSE;
+$config=array(
+ 'meta'=>array(
+  'title'=>'Nom de la soci&eacute;t&eacute;',
+  'description'=>'Description de la soci&eacute;t&eacute;',
+  'license'=>'Tous droits r&eacute;serv&eacute;s',
+  'tracking'=>'',
+  'antispam_q'=>'combien font cinq ajout&eacute;s &agrave; trois ?',
+  'antispam_r'=>email_chiffrement('8', $admin['0'], $iv),
+  'email'=>email_chiffrement('aaa@aaa.aa', $admin['0'], $iv)),
+ 'style'=>array(
+  'body_color'=>'black',
+  'body_color_link'=>'brown',
+  'body_color_link_hover'=>'red',
+  'body_backgroundcolor1'=>'white',
+  'body_backgroundcolor2'=>'lightgrey',
+  'body_backgroundimage'=>''),
+ 'page'=>array(
+  'main_title'=>'La soci&eacute;t&eacute;',
+  'main_text'=>'(pr&eacute;sentation de la soci&eacute;t&eacute;)',
+  'products_title'=>'Produits et Services',
+  'products_text'=>'(pr&eacute;sentation des produits et services)',
+  'offers_title'=>'Offres sp&eacute;ciales',
+  'offers_text'=>'(pr&eacute;sentation des offres sp&eacute;ciales)',
+  'contact_title'=>'Contact',
+  'contact_text'=>'(informations de contact, horaires, localisation..)'
+ )
+);
+
+// table des couleurs
+$couleurs=array('aliceblue', 'antiquewhite', 'aqua', 'aquamarine', 'azure', 'beige', 'bisque', 'black', 'blanchedalmond', 'blue', 'blueviolet', 'brown', 'burlywood', 'cadetblue', 'chartreuse', 'chocolate', 'coral', 'cornflowerblue', 'cornsilk', 'crimson', 'cyan', 'darkblue', 'darkcyan', 'darkgoldenrod', 'darkgray', 'darkgreen', 'darkkhaki', 'darkmagenta', 'darkolivegreen', 'darkorange', 'darkorchid', 'darkred', 'darksalmon', 'darkseagreen', 'darkslateblue', 'darkslategray', 'darkturquoise', 'darkviolet', 'deeppink', 'deepskyblue', 'dimgray', 'dodgerblue', 'firebrick', 'floralwhite', 'forestgreen', 'fuchsia', 'gainsboro', 'ghostwhite', 'gold', 'goldenrod', 'gray', 'green', 'greenyellow', 'honeydew', 'hotpink', 'indianred', 'indigo', 'ivory', 'khaki', 'lavender', 'lavenderblush', 'lawngreen', 'lemonchiffon', 'lightblue', 'lightcoral', 'lightcyan', 'lightgoldenrodyellow', 'lightgreen', 'lightgrey', 'lightpink', 'lightsalmon', 'lightseagreen', 'lightskyblue', 'lightslategray', 'lightsteelblue', 'lightyellow', 'lime', 'limegreen', 'linen', 'magenta', 'maroon', 'mediumaquamarine', 'mediumblue', 'mediumorchid', 'mediumpurple', 'mediumseagreen', 'mediumslateblue', 'mediumspringgreen', 'mediumturquoise', 'mediumvioletred', 'midnightblue', 'mintcream', 'mistyrose', 'moccasin', 'navajowhite', 'navy', 'oldlace', 'olive', 'olivedrab', 'orange', 'orangered', 'orchid', 'palegoldenrod', 'palegreen', 'paleturquoise', 'palevioletred', 'papayawhip', 'peachpuff', 'peru', 'pink', 'plum', 'powderblue', 'purple', 'red', 'rosybrown', 'royalblue', 'saddlebrown', 'salmon', 'sandybrown', 'seagreen', 'seashell', 'sienna', 'silver', 'skyblue', 'slateblue', 'slategray', 'snow', 'springgreen', 'steelblue', 'tan', 'teal', 'thistle', 'tomato', 'turquoise', 'violet', 'wheat', 'white', 'whitesmoke', 'yellow', 'yellowgreen');
+
+// enregistrement / chargement de la configuration depuis le fichier de données
+if(!file_exists('./data.json'))
+ file_put_contents('./data.json', json_encode($config), LOCK_EX);
+else {
+ $config_input = json_decode(file_get_contents('./data.json'), TRUE);
+ foreach($config_input as $key=>$value) { $config[$key] = $value; }
+}
+
+if(isset($_POST) and !empty($_POST) and $isadmin == TRUE ) {
+ foreach($_POST as $key=>$value) {
+   if($key == 'email') { if(isset($config['meta'][$key])) $config['meta'][$key] = email_chiffrement($value, $admin['0'], $iv); }
+   else if($key == 'antispam_r') { if(isset($config['meta'][$key])) $config['meta'][$key] = email_chiffrement($value, $admin['0'], $iv); }
+   else if($key == 'tracking') { if(isset($config['meta'][$key])) $config['meta'][$key] = $value; }
+   else { if(isset($config['meta'][$key])) $config['meta'][$key] = htmlentities($value, ENT_QUOTES); }
+   if(isset($config['style'][$key])) $config['style'][$key] = htmlentities($value, ENT_QUOTES);
+   if(isset($config['page'][$key])) $config['page'][$key] = $value;
+ }
+
+
+file_put_contents('./data.json', json_encode($config), LOCK_EX);
+}
+
+// contrôle de page
+if(isset($_GET['produits']))
+ $page = 'products';
+else if(isset($_GET['offres']))
+ $page = 'offers';
+else if(isset($_GET['contact']))
+ $page = 'contact';
+else if(isset($_GET['admin']) and $isadmin == TRUE) 
+ $page = 'admin';
+else
+ $page = 'main';
+
+
+// ========================|
+// panneau d'administration|
+// ========================|
+if($page == 'admin') { ?>
+<!DOCTYPE html><html><head><meta charset="UTF-8">
+<title>Panneau d'administration</title>
+<style type="text/css">
+div.content {background-color:white;width:50%;margin:1em auto;padding:1em;box-shadow:2px 2px 5px #888888;}
+h1 { background-color:yellow;text-align:center; }
+nav ul li {display:inline-block;margin-bottom:1.2em;}
+nav ul li a {text-decoration:none;padding:0.5em 1em 0.5em 1em;border:1px outset red;font-weight:bold;}
+input[type=text] {width:30em; }
+input[type=text].gestion {width:8em;font-family:monospace; }
+img.gestion {max-width:200px;max-height:200px;border:1px solid;}
+</style>
+<script src="//tinymce.cachefly.net/4.0/tinymce.min.js"></script>
+<script>tinymce.init({ plugins: "hr link image autoresize charmap table textcolor code", selector:'textarea', tools: "inserttable"});</script>
+</head>
+<body>
+<div class="content">
+<h1>Panneau d'administration</h1>
+<nav>
+ <ul>
+  <li><a href="./">&lArr; Retour au site</a></li>
+  <li><a href="./?admin">Informations générales</a></li>
+  <li><a href="./?admin=style">Couleurs</a></li>
+  <li><a href="./?admin=main">(page1) <?php echo $config['page']['main_title']; ?></a></li>
+  <li><a href="./?admin=produits">(page2) <?php echo $config['page']['products_title']; ?></a></li>
+  <li><a href="./?admin=offres">(page3) <?php echo $config['page']['offers_title']; ?></a></li>
+  <li><a href="./?admin=contact">(page4) <?php echo $config['page']['contact_title']; ?></a></li>
+  <li><a href="./?admin=images">Images</a></li>
+  <li><a href="./?admin=maintenance">Maintenance</a></li>
+ </ul>
+</nav>
+<?php
+if($_GET['admin'] == 'style') { 
+  echo '<h2>Couleurs du site</h2><form action="./?admin=style"  method="post">';
+  echo '<select name="body_color" onchange="changecolor(\'body_color\', value)">';
+  foreach($couleurs as $couleur) {
+   if($config['style']['body_color'] == $couleur)
+    echo '<option style="color:'.$couleur.';" value="'.$couleur.'" selected>'.$couleur.'</option>';
+  else
+    echo '<option style="color:'.$couleur.';" value="'.$couleur.'">'.$couleur.'</option>';
+   }
+  echo '</select>';
+  echo '<label for="body_color"> texte principal: <span id="body_color" style="color:'.$config['style']['body_color'].';background-color:white;font-weight:bold;">&nbsp;'.$config['meta']['title'].'&nbsp;</span></label><br>';
+
+
+  echo '<select name="body_color_link" onchange="changecolor(\'body_color_link\', value)">';foreach($couleurs as $couleur) {if($config['style']['body_color_link'] == $couleur) echo '<option style="color:'.$couleur.';" value="'.$couleur.'" selected>'.$couleur.'</option>'; else echo '<option style="color:'.$couleur.';" value="'.$couleur.'">'.$couleur.'</option>';} echo '</select>'; echo '<label for="body_color_link"> liens (texte): <span id="body_color_link" style="color:'.$config['style']['body_color_link'].';background-color:white;font-weight:bold;">&nbsp;Cliquez ici pour nous contacter !&nbsp;</span></label><br>';
+
+  echo '<select name="body_color_link_hover" onchange="changecolor(\'body_color_link_hover\', value)">';foreach($couleurs as $couleur) {if($config['style']['body_color_link_hover'] == $couleur) echo '<option style="color:'.$couleur.';" value="'.$couleur.'" selected>'.$couleur.'</option>'; else echo '<option style="color:'.$couleur.';" value="'.$couleur.'">'.$couleur.'</option>';} echo '</select>'; echo '<label for="body_color_link_hover"> liens au passage de la souris: <span id="body_color_link_hover" style="color:'.$config['style']['body_color_link_hover'].';background-color:white;font-weight:bold;">&nbsp;Cliquez ici pour nous contacter !&nbsp;</span></label><br><br>';
+
+  echo '<select name="body_backgroundcolor1" onchange="changebgcolor(\'body_backgroundcolor1\', value)">';foreach($couleurs as $couleur) {if($config['style']['body_backgroundcolor1'] == $couleur) echo '<option style="color:'.$couleur.';" value="'.$couleur.'" selected>'.$couleur.'</option>'; else echo '<option style="color:'.$couleur.';" value="'.$couleur.'">'.$couleur.'</option>';} echo '</select>'; echo '<label for="body_backgroundcolor1"> couleur de fond (haut): <span id="body_backgroundcolor1" style="border:1px solid;background-color:'.$config['style']['body_backgroundcolor1'].';">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></label><br>';
+  echo '<select name="body_backgroundcolor2" onchange="changebgcolor(\'body_backgroundcolor2\', value)">';foreach($couleurs as $couleur) {if($config['style']['body_backgroundcolor2'] == $couleur) echo '<option style="color:'.$couleur.';" value="'.$couleur.'" selected>'.$couleur.'</option>'; else echo '<option style="color:'.$couleur.';" value="'.$couleur.'">'.$couleur.'</option>';} echo '</select>'; echo '<label for="body_backgroundcolor2"> couleur de fond (bas) : <span id="body_backgroundcolor2" style="border:1px solid;background-color:'.$config['style']['body_backgroundcolor2'].';">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></label><br><br>';
+  echo '<input type="text" name="body_backgroundimage" placeholder="(insérer l\'identifiant de l\'image)" value="'.$config['style']['body_backgroundimage'].'" onclick="select()"><label for="body_backgroundimage">(option) image de fond</label><br><br>';
+
+if(!empty($config['style']['body_backgroundimage']))
+ echo '<img class="gestion" alt="" src="'.$config['style']['body_backgroundimage'].'"><br><br>Aperçu du fond en dégradé actuel (<i style="color:red">l\'image de fond ci-dessus remplace le dégradé</i>):<br>';
+else echo 'Aperçu du fond en dégradé actuel:<br>';
+echo '
+<div id="bgapercu" style="background:linear-gradient(to bottom, '.$config['style']['body_backgroundcolor1'].', '.$config['style']['body_backgroundcolor2'].');">
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+</div>
+';
+
+ echo '<br><input type="submit">';
+echo '<script type="text/javascript">
+function changecolor(id, couleur){
+  document.getElementById(id).style.color = couleur;
+}
+function changebgcolor(id, couleur){
+  document.getElementById(id).style.backgroundColor = couleur;
+}
+</script>';
+ if(!empty($_POST)) echo '<br><br><i style="color:green;">Données enregistrées avec succès. <a href="./">Retour au site</a></i>';
+}
+else if($_GET['admin'] == 'main') {
+   echo '<h2>Page 1: "'.$config['page']['main_title'].'"</h2>';
+echo '<form action="./?admin=main"  method="post">';
+  echo '<label for="main_title">Titre de la page</label><br><input type="text" name="main_title" placeholder="Titre de la page" value="'.$config['page']['main_title'].'" required><br><br>';
+  echo '<label for="main_text"> Contenu de la page</label><br><textarea name="main_text">'.$config['page']['main_text'].'</textarea><br>';
+ echo '<input type="submit">';
+
+ if(!empty($_POST)) echo '<br><br><i style="color:green;">Données enregistrées avec succès. <a href="./">Retour au site</a></i>';
+}
+else if($_GET['admin'] == 'produits') {
+   echo '<h2>Page 2: "'.$config['page']['products_title'].'"</h2>';
+echo '<form action="./?admin=produits"  method="post">';
+  echo '<label for="products_title">Titre de la page</label><br><input type="text" name="products_title" placeholder="Titre de la page" value="'.$config['page']['products_title'].'" required><br><br>';
+  echo '<label for="products_text"> Contenu de la page</label><br><textarea name="products_text">'.$config['page']['products_text'].'</textarea><br>';
+ echo '<input type="submit">';
+
+ if(!empty($_POST)) echo '<br><br><i style="color:green;">Données enregistrées avec succès. <a href="./">Retour au site</a></i>';
+}
+else if($_GET['admin'] == 'offres') {
+   echo '<h2>Page 3: "'.$config['page']['offers_title'].'"</h2>';
+echo '<form action="./?admin=offres"  method="post">';
+  echo '<label for="offers_title">Titre de la page</label><br><input type="text" name="offers_title" placeholder="Titre de la page" value="'.$config['page']['offers_title'].'" required><br><br>';
+  echo '<label for="offers_text"> Contenu de la page</label><br><textarea name="offers_text">'.$config['page']['offers_text'].'</textarea><br>';
+ echo '<input type="submit">';
+
+ if(!empty($_POST)) echo '<br><br><i style="color:green;">Données enregistrées avec succès. <a href="./">Retour au site</a></i>';
+}
+else if($_GET['admin'] == 'contact') {
+   echo '<h2>Page 4: "'.$config['page']['contact_title'].'"</h2>';
+echo '<form action="./?admin=contact"  method="post">';
+  echo '<label for="contact_title">Titre de la page</label><br><input type="text" name="contact_title" placeholder="Titre de la page" value="'.$config['page']['contact_title'].'" required><br><br>';
+  echo '<label for="contact_text"> Contenu de la page</label><br><textarea name="contact_text">'.$config['page']['contact_text'].'</textarea><br>';
+ echo '<input type="submit">';
+
+ if(!empty($_POST)) echo '<br><br><i style="color:green;">Données enregistrées avec succès. <a href="./">Retour au site</a></i>';
+}
+else if($_GET['admin'] == 'images') { 
+  if(isset($_GET['del'])) // suppression d'image
+   unlink($_GET['del'].'.png');
+
+// formulaire d'envoi d'images
+   echo '<h2>Gestionnaire d\'images</h2>';
+  echo 'Ajouter une image: (format JPG ou PNG)<br>
+   <form method="post" action="./?admin=images" enctype="multipart/form-data">
+   <input type="file" name="image">
+   <input type="submit">
+   </form><br><br>';
+$erreur=array();
+
+
+// envoi d'images: sont autorisés JPEG et PNG, si JPEG l'image est convertie en PNG, vérification du PNG à la sortie
+  if(!empty($_FILES)) {
+   if ($_FILES['image']['error'] > 0) $erreur[] = "Erreur de transfert";
+   $nom = './'.md5(uniqid(rand(), true));
+   move_uploaded_file($_FILES['image']['tmp_name'],$nom);
+   if($_FILES['image']['type'] !== 'image/png') { imagepng(imagecreatefromstring(file_get_contents($nom)), 'output.png'); unlink($nom); $nom = 'output.png'; }
+   $nouveaunom = hash_file('crc32', $nom).'.png';
+   rename($nom, $nouveaunom);
+   if(imagecreatefrompng($nouveaunom)) { } else { unlink($nouveaunom); $erreur[] = "Format de fichier invalide"; }
+  }
+
+  if(!empty($erreur))
+   { echo '<b>Une erreur est survenue:</b><br>'; foreach($erreur as $message) echo $message.'<br>';  }
+
+// listing des images 
+  echo 'Pour insérer une image dans une page, cliquez sur son identifiant (par ex: "c24e5f6b.png") et copiez-collez l\'identifiant dans le panneau d\'édition.<br>';
+  foreach (glob("*.png") as $filename) {
+    $id = substr($filename, 0, 8);
+    echo '<a href="'.$filename.'"><img class="gestion" alt="" src="'.$filename.'"></a> <a style="color:red;text-decoration:none;" title="Supprimer cette image" href="javascript:if(confirm(\'Supprimer cette image ?\')) document.location.href=\'./?admin=images&del='.$id.'\';">X</a><br><input class="gestion" type="text" value="'.hash_file('crc32', $filename).'.png" onclick="select()"><br><br>';
+  }
+} 
+
+// page de maintenance
+else if($_GET['admin'] == 'maintenance') {
+   echo '<h2>Maintenance du site</h2>';
+  echo '<b><a href="./data.json">Sauvegarder la configuration</a></b>  (clic droit > "Enregistrer la cible du lien sous...")<br><i>Pour restaurer une sauvegarde, envoyez le fichier sur le serveur à la place de l\'actuel.</i>';
+}
+
+// informations générales
+else {
+ echo '<h2>Informations générales</h2><form action="./?admin"  method="post">';
+  echo '<input type="text" name="title" placeholder="Nom de la société" value="'.$config['meta']['title'].'" required><label for="title">Nom de la société</label><br>';
+  echo '<input type="text" name="description" placeholder="Description de la société" value="'.$config['meta']['description'].'" required><label for="description">Description de la société</label><br>';
+  echo '<input type="text" name="license" placeholder="Licence copyright" value="'.$config['meta']['license'].'" required><label for="license">Licence copyright</label><br>';
+  echo '<input type="text" name="email" placeholder="Adresse email" value="'.email_dechiffrement($config['meta']['email'], $admin['0'], $iv).'" required><label for="email">Adresse email de contact</label><br>';
+  echo '<input type="text" name="antispam_q" placeholder="Antispam: question" value="'.$config['meta']['antispam_q'].'" required><label for="antispam_q">Question pour l\'antispam</label><br>';
+  echo '<input type="text" name="antispam_r" placeholder="Antispam: réponse" value="'.email_dechiffrement($config['meta']['antispam_r'], $admin['0'], $iv).'" required><label for="antispam_r">Réponse de la question</label><br>';
+  echo '<input type="text" name="tracking" placeholder="Code de tracking" value="'.htmlentities($config['meta']['tracking'], ENT_QUOTES).'"><label for="tracking">(option) code de tracking</label><br>';
+ echo '<input type="submit">';
+ if(!empty($_POST)) echo '<br><br><i style="color:green;">Données enregistrées avec succès. <a href="./">Retour au site</a></i>';
+}
+
+?>
+</div>
+</body></html>
+
+<?php } else { /* affichage des pages publiques  */ ?>
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title><?php echo $config['meta']['title'].' | '.$config['page'][$page.'_title']; ?></title>
+<meta name="description" content="<?php echo $config['meta']['description']; ?>">
+<?php
+if(isMobile) { ?>
+
+<?php } else { ?>
+
+<?php } ?>
+<style type="text/css">
+body {color:<?php echo $config['style']['body_color']; ?>;font-family:sans-serif;text-align:justify;background:linear-gradient(to bottom, <?php echo $config['style']['body_backgroundcolor1']; ?>, <?php echo $config['style']['body_backgroundcolor2']; ?>);<?php if(!empty($config['style']['body_backgroundimage']) and file_exists($config['style']['body_backgroundimage'])) echo 'background-image: url("'.$config['style']['body_backgroundimage'].'");background-repeat: no-repeat;background-position:top center;'; ?> background-attachment:fixed;}
+a {color:<?php echo $config['style']['body_color_link']; ?>;font-weight:bold;}
+a:hover {color:<?php echo $config['style']['body_color_link_hover']; ?>;}
+<?php if(isMobile() == TRUE) echo 'div.content {background-color:white;padding:1em;box-shadow:2px 2px 5px #888888;border:1px solid #888;border-radius:15px;} nav ul li a {font-size:2em;text-decoration:none;padding:0.2em 1em 0.2em 1em;border:1px outset #bbb;border-radius:5px;}';
+else echo 'div.content {background-color:white;width:50%;min-width:35em;margin:1em auto;padding:1em;box-shadow:2px 2px 5px #888888;border-radius:15px;} nav ul li a {text-decoration:none;padding:0.5em 1em 0.5em 1em;border:1px outset #bbb;border-radius:5px;}'; ?>
+footer {text-align:center;font-size:small;}
+header h1,h2 {text-align:center;}
+nav ul li {display:inline-block;margin-bottom:1.2em;}
+article h1 {margin-left:1em;}
+article img {border:1px solid;}
+</style>
+</head>
+<body>
+<?php if($isadmin == TRUE) echo '<a style="font-size:small;" href="./?admin">Admin</a>'; ?>
+<div class="content">
+<header>
+<h1><?php echo $config['meta']['title']; ?></h1>
+<h2><?php echo $config['meta']['description']; ?></h2>
+<nav>
+ <ul>
+  <li><a href="./"><?php echo $config['page']['main_title']; ?></a></li>
+  <li><a href="./?produits"><?php echo $config['page']['products_title']; ?></a></li>
+  <li><a href="./?offres"><?php echo $config['page']['offers_title']; ?></a></li>
+  <li><a href="./?contact"><?php echo $config['page']['contact_title']; ?></a></li>
+ </ul>
+</nav>
+</header>
+
+<article>
+<h1><?php echo $config['page'][$page.'_title']; ?></h1>
+<?php
+// envoi email
+if($page == 'contact') {
+echo '<b>Formulaire de contact:</b><br><br>';
+$nom='';$email='';$texte='';
+if(isset($_POST) and !empty($_POST)) {
+ $nom = htmlentities($_POST['nom']);
+ $email = htmlentities($_POST['addremail']);
+ $check = htmlentities($_POST['abot']);
+ $texte = htmlentities($_POST['texte']);
+ if($check == email_dechiffrement($config['meta']['antispam_r'], $admin['0'], $iv)) {
+   mail(email_dechiffrement($config['meta']['email'], $admin['0'], $iv), '[formulaire de contact site web]', '** adresse IP: '.$_SERVER['REMOTE_ADDR']."\n\n$texte", "From: $email\r\n");
+   echo '<br><b style="color:darkgreen">Message transmis avec succès.</b><br>Nous vous répondrons dans les meilleurs délais.<br>';
+   }
+ else echo '<br><b>Une erreur a été détectée.<br>Merci de vérifier votre saisie:</b><br>';
+ }
+
+if(isMobile() == TRUE) echo '<form action="./?contact" method="post">
+<input type="text" name="nom" value="'.$nom.'" placeholder="Votre nom" required><br>
+<input type="email" name="addremail" value="'.$email.'" placeholder="Votre adresse mail" required><br>
+<textarea name="texte" placeholder="Votre message" rows="10" required>'.$texte.'</textarea><br>
+antispam:<br>
+<input type="text" name="abot" value="" placeholder="réponse" required><label for="abot"> '.$config['meta']['antispam_q'].'</label><br>
+<input type="submit" value="Envoyer">'; 
+
+else echo '<form action="./?contact" method="post">
+<input type="text" name="nom" value="'.$nom.'" size="50%" placeholder="Votre nom" required><br>
+<input type="email" name="addremail" value="'.$email.'" size="50%" placeholder="Votre adresse mail" required><br>
+<textarea name="texte" placeholder="Votre message" rows="10" cols="50%" required>'.$texte.'</textarea><br>
+antispam:<br>
+<input type="text" name="abot" value="" max="1" placeholder="réponse" required><label for="abot"> '.$config['meta']['antispam_q'].'</label><br>
+<input type="submit" value="Envoyer">';
+}
+echo $config['page'][$page.'_text']; ?>
+</article>
+
+<footer><?php echo '&copy;'.date('Y').' '.$config['meta']['title']; ?> - <?php echo $config['meta']['license'].$config['meta']['tracking']; ?><br><span style="font-size:x-small">site propulsé par <a href="http://code.rts-informatique.fr/minivit/index_php.txt">MiniVit</a></span></footer>
+</div>
+
+</body>
+</html>
+<?php
+}
+?>
