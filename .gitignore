@@ -1,2 +1,7 @@
 data.json
 admin.php
+*.png
+robots.txt
+.htaccess
+*.html
+*/*
