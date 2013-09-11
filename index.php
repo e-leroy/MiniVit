@@ -371,7 +371,7 @@ antispam:<br>
 echo $config['page'][$page.'_text']; ?>
 </article>
 
-<footer><?php echo '&copy;'.date('Y').' '.$config['meta']['title']; ?> - <?php echo $config['meta']['license'].$config['meta']['tracking']; ?><br><span style="font-size:x-small">site propulsé par <a href="http://code.rts-informatique.fr/minivit/index_php.txt">MiniVit</a></span></footer>
+<footer><?php echo '&copy;'.date('Y').' '.$config['meta']['title']; ?> - <?php echo $config['meta']['license'].$config['meta']['tracking']; ?><br><span style="font-size:x-small">site propulsé par <a href="https://github.com/rtsinfo/MiniVit">MiniVit</a></span></footer>
 </div>
 
 </body>
