@@ -18,7 +18,7 @@ Pré-requis et installation
 - hébergement web
 - PHP 5.3+ avec support JSON
 
-- envoyez le fichier "index.php" par FTP, SFTP ou tout autre moyen
+Envoyez le fichier "index.php" par FTP, SFTP ou tout autre moyen
 
 > Alternative avec git:
 - git clone https://github.com/rtsinfo/MiniVit
@@ -31,7 +31,7 @@ Pré-requis et installation
 Mise à jour
 ===================
 
-- remplacez "index.php" par la nouvelle version
+Remplacez "index.php" par la nouvelle version
 
 > Alternative avec git:
 - git pull origin master
