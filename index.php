@@ -288,13 +288,18 @@ else {
 <meta charset="UTF-8">
 <title><?php echo $config['meta']['title'].' | '.$config['page'][$page.'_title']; ?></title>
 <meta name="description" content="<?php echo $config['meta']['description']; ?>">
-<meta name="viewport" content="initial-scale=1.0, user-scalable=yes">
+<?php
+if(isMobile) { ?>
+
+<?php } else { ?>
+
+<?php } ?>
 <style type="text/css">
 body {color:<?php echo $config['style']['body_color']; ?>;font-family:sans-serif;text-align:justify;background:linear-gradient(to bottom, <?php echo $config['style']['body_backgroundcolor1']; ?>, <?php echo $config['style']['body_backgroundcolor2']; ?>);<?php if(!empty($config['style']['body_backgroundimage']) and file_exists($config['style']['body_backgroundimage'])) echo 'background-image: url("'.$config['style']['body_backgroundimage'].'");background-repeat: no-repeat;background-position:top center;'; ?> background-attachment:fixed;}
 a {color:<?php echo $config['style']['body_color_link']; ?>;font-weight:bold;}
 a:hover {color:<?php echo $config['style']['body_color_link_hover']; ?>;}
-div.content {background-color:white;width:50%;min-width:35em;margin:1em auto;padding:1em;box-shadow:2px 2px 5px #888888;border-radius:15px;}
-nav ul li a {text-decoration:none;padding:0.5em 1em 0.5em 1em;border:1px outset #bbb;border-radius:5px;}
+<?php if(isMobile() == TRUE) echo 'div.content {background-color:white;padding:1em;box-shadow:2px 2px 5px #888888;border:1px solid #888;border-radius:15px;} nav ul li a {font-size:2em;text-decoration:none;padding:0.2em 1em 0.2em 1em;border:1px outset #bbb;border-radius:5px;}';
+else echo 'div.content {background-color:white;width:50%;min-width:35em;margin:1em auto;padding:1em;box-shadow:2px 2px 5px #888888;border-radius:15px;} nav ul li a {text-decoration:none;padding:0.5em 1em 0.5em 1em;border:1px outset #bbb;border-radius:5px;}'; ?>
 footer {text-align:center;font-size:small;}
 header h1,h2 {text-align:center;}
 nav ul li {display:inline-block;margin-bottom:1.2em;}
@@ -337,14 +342,22 @@ if(isset($_POST) and !empty($_POST)) {
  else echo '<br><b>Une erreur a été détectée.<br>Merci de vérifier votre saisie:</b><br>';
  }
 
-echo '<form action="./?contact" method="post">
+if(isMobile() == TRUE) echo '<form action="./?contact" method="post">
+<input type="text" name="nom" value="'.$nom.'" placeholder="Votre nom" required><br>
+<input type="email" name="addremail" value="'.$email.'" placeholder="Votre adresse mail" required><br>
+<textarea name="texte" placeholder="Votre message" rows="10" required>'.$texte.'</textarea><br>
+antispam:<br>
+<input type="text" name="abot" value="" placeholder="réponse" required><label for="abot"> '.$config['meta']['antispam_q'].'</label><br>
+<input type="submit" value="Envoyer">'; 
+
+else echo '<form action="./?contact" method="post">
 <input type="text" name="nom" value="'.$nom.'" size="50%" placeholder="Votre nom" required><br>
 <input type="email" name="addremail" value="'.$email.'" size="50%" placeholder="Votre adresse mail" required><br>
 <textarea name="texte" placeholder="Votre message" rows="10" cols="50%" required>'.$texte.'</textarea><br>
 antispam:<br>
 <input type="text" name="abot" value="" max="1" placeholder="réponse" required><label for="abot"> '.$config['meta']['antispam_q'].'</label><br>
 <input type="submit" value="Envoyer">';
-
+}
 echo $config['page'][$page.'_text']; ?>
 </article>
 
