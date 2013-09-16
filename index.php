@@ -1,5 +1,7 @@
 <?php 
 
+$version=20130916;
+
 // ***  configuration de l'adresse IP de l'administrateur ***
 $admin=FALSE;
 if(file_exists('./admin.php'))
@@ -29,10 +31,12 @@ function email_dechiffrement($string, $ip, $iv) {
 $panneau_admin = FALSE;
 $config=array(
  'meta'=>array(
+  'version'=>$version,
   'title'=>'Nom de la soci&eacute;t&eacute;',
   'description'=>'Description de la soci&eacute;t&eacute;',
   'license'=>'Tous droits r&eacute;serv&eacute;s',
   'tracking'=>'',
+  'hostingspace'=>'9',
   'antispam_q'=>'combien font cinq ajout&eacute;s &agrave; trois ?',
   'antispam_r'=>email_chiffrement('8', $admin['0'], $iv),
   'email'=>email_chiffrement('aaa@aaa.aa', $admin['0'], $iv)),
@@ -60,11 +64,23 @@ $couleurs=array('aliceblue', 'antiquewhite', 'aqua', 'aquamarine', 'azure', 'bei
 
 // enregistrement / chargement de la configuration depuis le fichier de données
 if(!file_exists('./data.json'))
- file_put_contents('./data.json', json_encode($config), LOCK_EX);
+ file_put_contents('./data.json', json_encode($config), LOCK_EX) or die('Le fichier de configuration n\'a pas pu être écrit. Vérifiez les permissions.');
 else {
+
+ if(json_decode(file_get_contents('./data.json')) === NULL) {   // correction de config invalide
+  copy('./data-prev.json', './data.json'); die('ERREUR: la configuration actuelle est corrompue. Elle a été remplacée par la configuration précédente. <a href="javascript:location.reload();">Cliquer pour recharger la page</a>');
+ }
+
  $config_input = json_decode(file_get_contents('./data.json'), TRUE);
- foreach($config_input as $key=>$value) { $config[$key] = $value; }
+ if(!isset($config_input['meta']['version']) or $config_input['meta']['version'] < $config['meta']['version']) $old = TRUE; // vérification de version de config
+ foreach($config_input as $key=>$key2)
+  foreach($key2 as $item=>$value)
+   $config[$key][$item] = $value;  // récupération des valeurs actuelles
+
+ if(isset($old) and $old == TRUE) { $config['meta']['version']=$version; file_put_contents('./data-new.json', json_encode($config), LOCK_EX) or die('Le fichier de configuration n\'a pas pu être écrit. Vérifiez les permissions.'); } // enregistrement de configuration neuve
 }
+
+
 
 if(isset($_POST) and !empty($_POST) and $isadmin == TRUE ) {
  foreach($_POST as $key=>$value) {
@@ -77,8 +93,17 @@ if(isset($_POST) and !empty($_POST) and $isadmin == TRUE ) {
  }
 
 
-file_put_contents('./data.json', json_encode($config), LOCK_EX);
+file_put_contents('./data-new.json', json_encode($config), LOCK_EX) or die('Le fichier de configuration n\'a pas pu être écrit. Vérifiez les permissions.');
 }
+
+// changement du fichier de configuration
+if(file_exists('./data-new.json'))
+ if(filesize('./data-new.json') > 300) {
+  copy('./data.json', './data-prev.json');
+  copy('./data-new.json', './data.json');
+  unlink('./data-new.json');
+}
+
 
 // contrôle de page
 if(isset($_GET['produits']))
@@ -262,6 +287,7 @@ else {
   echo '<input type="text" name="email" placeholder="Adresse email" value="'.email_dechiffrement($config['meta']['email'], $admin['0'], $iv).'" required><label for="email">Adresse email de contact</label><br>';
   echo '<input type="text" name="antispam_q" placeholder="Antispam: question" value="'.$config['meta']['antispam_q'].'" required><label for="antispam_q">Question pour l\'antispam</label><br>';
   echo '<input type="text" name="antispam_r" placeholder="Antispam: réponse" value="'.email_dechiffrement($config['meta']['antispam_r'], $admin['0'], $iv).'" required><label for="antispam_r">Réponse de la question</label><br>';
+  echo '<input type="text" name="hostingspace" placeholder="Espace web" value="'.$config['meta']['hostingspace'].'" required><label for="hostingspace">Espace d\'hébergement (en Mo)</label><br>';
   echo '<input type="text" name="tracking" placeholder="Code de tracking" value="'.htmlentities($config['meta']['tracking'], ENT_QUOTES).'"><label for="tracking">(option) code de tracking</label><br>';
  echo '<input type="submit">';
  if(!empty($_POST)) echo '<br><br><i style="color:green;">Données enregistrées avec succès. <a href="./">Retour au site</a></i>';
