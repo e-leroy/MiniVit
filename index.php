@@ -1,6 +1,8 @@
 <?php 
 
 $version=20130916;
+ini_set('display_errors','0');
+// DEBUG: ini_set('display_errors','1');
 
 // ***  configuration de l'adresse IP de l'administrateur ***
 $admin=FALSE;
@@ -18,12 +20,12 @@ else $isadmin = FALSE;
 
 // calcul de l'espace disque utilisé
 
-function espaceutilise($max) {
+function espaceutilise($max='') {
  foreach (glob("*") as $filename) {
     $size[] = filesize($filename);
   }
  $size = round(array_sum($size)/1000/1000, 1);
- if(isset($max)) {
+ if(!empty($max)) {
   $pourcent = round($size*100/$max, 1); return $pourcent;
  }
  else return $size;
@@ -261,8 +263,9 @@ else if($_GET['admin'] == 'images') {
 
 // formulaire d'envoi d'images
    echo '<h2>Gestionnaire d\'images</h2>';
-   echo 'Espace disque utilisé: <b>'.espaceutilise().' Mo</b>  ('.espaceutilise($config['meta']['hostingspace']).' % du quota)<br><br>';
-  echo 'Ajouter une image: (format JPG ou PNG, poids maximum: 1 Mo)<br>
+   echo 'Espace disque utilisé: <b>'.espaceutilise().' Mo</b>  ('.espaceutilise($config['meta']['hostingspace']).' % du quota)<br>';
+if(espaceutilise($config['meta']['hostingspace']) > 80) echo '<b style="color:yellow;background-color:black">AVERTISSEMENT: '.espaceutilise($config['meta']['hostingspace']).' %</b><br><b style="color:red">Il y a peu ou pas d\'espace d\'hébergement libre. Veuillez supprimer des images non utilisées, ou utiliser un hébergement avec quota supérieur. Il est déconseillé d\'ajouter de nouvelles images actuellement.</b><br>';
+  echo '<br>Ajouter une image: (format JPG ou PNG, poids maximum: 1 Mo)<br>
    <form method="post" action="./?admin=images" enctype="multipart/form-data">
    <input type="hidden" name="MAX_FILE_SIZE" value="1048576">
    <input type="file" name="image">
