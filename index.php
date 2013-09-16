@@ -16,6 +16,25 @@ if(in_array($_SERVER['REMOTE_ADDR'], $admin))
  $isadmin = TRUE;
 else $isadmin = FALSE;
 
+// calcul de l'espace disque utilisé
+
+function espaceutilise($max) {
+ foreach (glob("*") as $filename) {
+    $size[] = filesize($filename);
+  }
+ $size = round(array_sum($size)/1000/1000, 1);
+ if(isset($max)) {
+  $pourcent = round($size*100/$max, 1); return $pourcent;
+ }
+ else return $size;
+}
+
+function poidsfichier($fichier) {
+ $size = filesize($fichier);
+ $size = round($size/1000/1000, 3);
+ return $size;
+}
+
 // chiffrement
 $iv=substr(base64_encode(hash('sha256', $admin['0'])), 0, 16);
 
@@ -242,8 +261,10 @@ else if($_GET['admin'] == 'images') {
 
 // formulaire d'envoi d'images
    echo '<h2>Gestionnaire d\'images</h2>';
-  echo 'Ajouter une image: (format JPG ou PNG)<br>
+   echo 'Espace disque utilisé: <b>'.espaceutilise().' Mo</b>  ('.espaceutilise($config['meta']['hostingspace']).' % du quota)<br><br>';
+  echo 'Ajouter une image: (format JPG ou PNG, poids maximum: 1 Mo)<br>
    <form method="post" action="./?admin=images" enctype="multipart/form-data">
+   <input type="hidden" name="MAX_FILE_SIZE" value="1048576">
    <input type="file" name="image">
    <input type="submit">
    </form><br><br>';
@@ -252,30 +273,61 @@ $erreur=array();
 
 // envoi d'images: sont autorisés JPEG et PNG, si JPEG l'image est convertie en PNG, vérification du PNG à la sortie
   if(!empty($_FILES)) {
-   if ($_FILES['image']['error'] > 0) $erreur[] = "Erreur de transfert";
+   if ($_FILES['image']['error'] == 1) $erreur[] = "Limite d'envoi du serveur dépassée";
+   if ($_FILES['image']['error'] == 2) $erreur[] = "Fichier trop lourd";
+   if ($_FILES['image']['error'] == 3) $erreur[] = "Envoi interrompu";
+   if ($_FILES['image']['error'] == 4) $erreur[] = "Aucun fichier spécifié";
    $nom = './'.md5(uniqid(rand(), true));
    move_uploaded_file($_FILES['image']['tmp_name'],$nom);
    if($_FILES['image']['type'] !== 'image/png') { imagepng(imagecreatefromstring(file_get_contents($nom)), 'output.png'); unlink($nom); $nom = 'output.png'; }
    $nouveaunom = hash_file('crc32', $nom).'.png';
    rename($nom, $nouveaunom);
-   if(imagecreatefrompng($nouveaunom)) { } else { unlink($nouveaunom); $erreur[] = "Format de fichier invalide"; }
+   if(imagecreatefrompng($nouveaunom)) { } else { unlink($nouveaunom); if(empty($erreur)) { $erreur[] = "Format de fichier invalide";} }
+   if(filesize($nouveaunom) > 1048576) { $size = poidsfichier($nouveaunom);  unlink($nouveaunom); $erreur[] = "Fichier trop lourd après conversion: $size Mo"; }
   }
 
   if(!empty($erreur))
-   { echo '<b>Une erreur est survenue:</b><br>'; foreach($erreur as $message) echo $message.'<br>';  }
+   { echo '<b style="color:red">Une erreur est survenue:</b><br>'; foreach($erreur as $message) echo $message.'<br>';echo '<br><br>';  }
+  if(!empty($_FILES) and empty($erreur)) echo '<b style="color:green">Envoi réussi: '.$nouveaunom.'</b><br><br>';
 
 // listing des images 
   echo 'Pour insérer une image dans une page, cliquez sur son identifiant (par ex: "c24e5f6b.png") et copiez-collez l\'identifiant dans le panneau d\'édition.<br>';
   foreach (glob("*.png") as $filename) {
     $id = substr($filename, 0, 8);
-    echo '<a href="'.$filename.'"><img class="gestion" alt="" src="'.$filename.'"></a> <a style="color:red;text-decoration:none;" title="Supprimer cette image" href="javascript:if(confirm(\'Supprimer cette image ?\')) document.location.href=\'./?admin=images&del='.$id.'\';">X</a><br><input class="gestion" type="text" value="'.hash_file('crc32', $filename).'.png" onclick="select()"><br><br>';
+    echo '<a href="'.$filename.'"><img class="gestion" alt="" src="'.$filename.'"></a> <a style="color:red;text-decoration:none;" title="Supprimer cette image" href="javascript:if(confirm(\'Supprimer cette image ?\')) document.location.href=\'./?admin=images&del='.$id.'\';">X</a><br><input title="Cliquer pour sélectionner cette image" class="gestion" type="text" value="'.hash_file('crc32', $filename).'.png" onclick="select()"> <b>'.poidsfichier($filename).' Mo</b><br><br>';
   }
 } 
 
 // page de maintenance
 else if($_GET['admin'] == 'maintenance') {
    echo '<h2>Maintenance du site</h2>';
-  echo '<b><a href="./data.json">Sauvegarder la configuration</a></b>  (clic droit > "Enregistrer la cible du lien sous...")<br><i>Pour restaurer une sauvegarde, envoyez le fichier sur le serveur à la place de l\'actuel.</i>';
+   echo '<pre>Version du gestionnaire: '.$version.'<br>';
+   echo 'Dernière modification de la configuration: '.date('d/m/Y H:i (e)', filemtime('./data.json')).'<br>';
+   echo 'Espace disque utilisé: <b>'.espaceutilise().' Mo</b>  ('.espaceutilise($config['meta']['hostingspace']).' % du quota)<br>';
+  echo '</pre><br><br><b><a href="./data.json">Sauvegarder la configuration</a></b>  (clic droit > "Enregistrer la cible du lien sous...")';
+  echo '<br><br><b>Restaurer un fichier de configuration</b><br>
+   <form method="post" action="./?admin=maintenance" enctype="multipart/form-data">
+   <input type="hidden" name="MAX_FILE_SIZE" value="1048576">
+   <input type="file" name="config">
+   <input type="submit">
+   </form><br><br>';
+// restauration de configuration
+  if(!empty($_FILES)) {
+   if ($_FILES['image']['error'] == 1) $erreur[] = "Limite d'envoi du serveur dépassée";
+   if ($_FILES['image']['error'] == 2) $erreur[] = "Fichier trop lourd";
+   if ($_FILES['image']['error'] == 3) $erreur[] = "Envoi interrompu";
+   if ($_FILES['image']['error'] == 4) $erreur[] = "Aucun fichier spécifié";
+   $nom = './data-import.json';
+   move_uploaded_file($_FILES['config']['tmp_name'],$nom);
+   if(empty($erreur)) {
+    copy('data.json', 'data-prev.json');
+    copy('data-import.json', 'data.json');
+    unlink('data-import.json');
+    echo '<b style="color:green">Fichier restauré.</b> <a href="./?admin=maintenance">Cliquer pour recharger la page</a>';
+    }
+   else { unlink('data-import.json'); echo '<b style="color:red">Une erreur est survenue:</b><br>'; foreach($erreur as $message) echo $message.'<br>'; }
+
+  }
 }
 
 // informations générales
@@ -287,7 +339,7 @@ else {
   echo '<input type="text" name="email" placeholder="Adresse email" value="'.email_dechiffrement($config['meta']['email'], $admin['0'], $iv).'" required><label for="email">Adresse email de contact</label><br>';
   echo '<input type="text" name="antispam_q" placeholder="Antispam: question" value="'.$config['meta']['antispam_q'].'" required><label for="antispam_q">Question pour l\'antispam</label><br>';
   echo '<input type="text" name="antispam_r" placeholder="Antispam: réponse" value="'.email_dechiffrement($config['meta']['antispam_r'], $admin['0'], $iv).'" required><label for="antispam_r">Réponse de la question</label><br>';
-  echo '<input type="text" name="hostingspace" placeholder="Espace web" value="'.$config['meta']['hostingspace'].'" required><label for="hostingspace">Espace d\'hébergement (en Mo)</label><br>';
+  echo '<input type="text" name="hostingspace" placeholder="Espace web" value="'.$config['meta']['hostingspace'].'" required><label for="hostingspace">Quota d\'espace d\'hébergement (en Mo)</label><br>';
   echo '<input type="text" name="tracking" placeholder="Code de tracking" value="'.htmlentities($config['meta']['tracking'], ENT_QUOTES).'"><label for="tracking">(option) code de tracking</label><br>';
  echo '<input type="submit">';
  if(!empty($_POST)) echo '<br><br><i style="color:green;">Données enregistrées avec succès. <a href="./">Retour au site</a></i>';
