@@ -155,7 +155,12 @@ input[type=text].gestion {width:8em;font-family:monospace; }
 img.gestion {max-width:200px;max-height:200px;border:1px solid;}
 </style>
 <script src="//tinymce.cachefly.net/4.0/tinymce.min.js"></script>
-<script>tinymce.init({ plugins: "hr link image autoresize charmap table textcolor code", selector:'textarea', tools: "inserttable"});</script>
+<script>tinymce.init({ 
+	plugins: "hr link image autoresize charmap table textcolor code",
+	selector:'textarea',
+	toolbar1: "alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link unlink image | preview",
+	toolbar2: "undo redo | styleselect | bold italic underline strikethrough | subscript superscript | forecolor backcolor",
+	tools: "inserttable"});</script>
 </head>
 <body>
 <div class="content">
