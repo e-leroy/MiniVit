@@ -7,10 +7,16 @@ Ultra-minimalist "vitrine" website manager
 
 [ FR ]
 
+Développé par Emmanuel LEROY et [RTS INFORMATIQUE](http://www.rts-informatique.fr/)
+
+Instances MiniVit existantes:
+- [RTS INFORMATIQUE](http://www.rts-informatique.fr/)
+- [Garage KUHN SAS Haguenau](http://www.garagekuhn.com/)
+
 Licence
 ===================
 
-Merci de se référer au fichier LICENSE
+Licence BSD. Merci de se référer [au fichier de licence](LICENSE)
 
 Pré-requis et installation
 ===================
