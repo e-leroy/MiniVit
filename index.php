@@ -407,7 +407,10 @@ if(isset($_POST) and !empty($_POST)) {
  $check = htmlentities($_POST['abot']);
  $texte = htmlentities($_POST['texte']);
  if($check == email_dechiffrement($config['meta']['antispam_r'], $admin['0'], $iv)) {
-   mail(email_dechiffrement($config['meta']['email'], $admin['0'], $iv), '[formulaire de contact site web]', '** adresse IP: '.$_SERVER['REMOTE_ADDR']."\n\n$texte", "From: $email\r\n");
+ 	$headers  = 'MIME-Version: 1.0' . "\r\n";
+ 	$headers .= 'Content-type: text/plain; charset=UTF-8' . "\r\n";
+ 	$headers .= "From: $email\r\n";
+   mail(email_dechiffrement($config['meta']['email'], $admin['0'], $iv), '[formulaire de contact site web]', '** adresse IP: '.$_SERVER['REMOTE_ADDR']."\n\n$texte", $headers);
    echo '<br><b style="color:darkgreen">Message transmis avec succès.</b><br>Nous vous répondrons dans les meilleurs délais.<br>';
    }
  else echo '<br><b>Une erreur a été détectée.<br>Merci de vérifier votre saisie:</b><br>';
