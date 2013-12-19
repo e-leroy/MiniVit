@@ -405,7 +405,7 @@ if(isset($_POST) and !empty($_POST)) {
  $nom = htmlentities($_POST['nom']);
  $email = htmlentities($_POST['addremail']);
  $check = htmlentities($_POST['abot']);
- $texte = htmlentities($_POST['texte']);
+ $texte = $_POST['texte'];
  if($check == email_dechiffrement($config['meta']['antispam_r'], $admin['0'], $iv)) {
  	$headers  = 'MIME-Version: 1.0' . "\r\n";
  	$headers .= 'Content-type: text/plain; charset=UTF-8' . "\r\n";
