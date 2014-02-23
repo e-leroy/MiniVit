@@ -1,6 +1,5 @@
 <?php 
-
-$version=20140223;
+$version=file_get_contents('./version');
 date_default_timezone_set('UTC');
 ini_set('display_errors','0');
 // DEBUG: ini_set('display_errors','1');
@@ -420,7 +419,9 @@ $erreur=array();
 // page de maintenance
 else if($_GET['admin'] == 'maintenance') {
    echo '<h2>Maintenance du site</h2>';
-   echo '<pre>Version du gestionnaire: '.$version.'<br>';
+   $newversion='';$checknewversion=file_get_contents('https://raw.github.com/e-leroy/MiniVit/master/version');
+   if($checknewversion > $version) $newversion=' ~ <a href="https://github.com/e-leroy/MiniVit">une mise à jour est disponible: '.$checknewversion.' !</a>';
+   echo '<pre>Version du gestionnaire: '.$version.$newversion'<br>';
    echo 'Dernière modification de la configuration: '.date('d/m/Y H:i (e)', filemtime('./data.json')).'<br>';
    echo 'Espace disque utilisé: <b>'.espaceutilise().' Mo</b>  ('.espaceutilise($config['meta']['hostingspace']).' % du quota)<br>';
   echo '</pre><br><br><b><a href="./data.json">Sauvegarder la configuration</a></b>  (clic droit > "Enregistrer la cible du lien sous...")';
