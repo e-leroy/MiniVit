@@ -14,7 +14,7 @@ if (!empty($_POST))
 		$username = (string)$_POST['username'];
 		$password = (string)$_POST['password'];
 		$email = (string)$_POST['email'];
-		$hash = password_hash($password, PASSWORD_DEFAULT, ["cost" => 14]);
+		$hash = password_hash($password, PASSWORD_DEFAULT, ["cost" => 12]);
 		file_put_contents('./admin.ini.php', '; <?php header("Location: ./"); exit; ?> DO NOT REMOVE THIS LINE'."\n".'[0]'."\n".'user= "'.$username.'"'."\n".'email = "'.$email.'"'."\n".'password = "'.$hash.'"');
 		die('Compte crée. <a href="./">Cliquez ici pour continuer</a>');
 	}
