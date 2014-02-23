@@ -62,8 +62,9 @@ function adminLogin($username, $password) {
 		else
 			return FALSE; // mot de passe faux
 	}
-	else
-		return FALSE;  // utilisateur faux
+	else {
+		usleep(rand(4000000, 7000000)); return FALSE;  // utilisateur faux
+	}  
 }
 
 // antibot
