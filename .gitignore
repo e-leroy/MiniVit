@@ -1,6 +1,8 @@
 data.json
-admin.php
+admin.ini.php
 *.png
+*.session
+*.pdf
 robots.txt
 .htaccess
 *.html
