@@ -420,7 +420,7 @@ $erreur=array();
 else if($_GET['admin'] == 'maintenance') {
    echo '<h2>Maintenance du site</h2>';
    $newversion='';$checknewversion=file_get_contents('https://raw.github.com/e-leroy/MiniVit/master/version');
-   if($checknewversion > $version) $newversion=' ~ <a href="https://github.com/e-leroy/MiniVit">une mise à jour est disponible: '.$checknewversion.' !</a>';
+   if($checknewversion > $version) $newversion='<br><a href="https://github.com/e-leroy/MiniVit">une mise à jour est disponible: '.$checknewversion.'</a>';
    echo '<pre>Version du gestionnaire: '.$version.$newversion.'<br>';
    echo 'Dernière modification de la configuration: '.date('d/m/Y H:i (e)', filemtime('./data.json')).'<br>';
    echo 'Espace disque utilisé: <b>'.espaceutilise().' Mo</b>  ('.espaceutilise($config['meta']['hostingspace']).' % du quota)<br>';
