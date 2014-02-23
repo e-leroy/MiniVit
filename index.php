@@ -63,7 +63,7 @@ function adminLogin($username, $password) {
 			return FALSE; // mot de passe faux
 	}
 	else {
-		usleep(rand(4000000, 7000000)); return FALSE;  // utilisateur faux
+		password_verify($password, $ini_array['password']); return FALSE;  // utilisateur faux (on fait quand même tourner le check du mot de passe à vide)
 	}  
 }
 
