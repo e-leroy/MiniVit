@@ -1,22 +1,82 @@
 <?php 
 
-$version=20130916;
+$version=20140223;
+date_default_timezone_set('UTC');
 ini_set('display_errors','0');
 // DEBUG: ini_set('display_errors','1');
 
-// ***  configuration de l'adresse IP de l'administrateur ***
-$admin=FALSE;
-if(file_exists('./admin.php'))
- require_once('./admin.php');
-else
- die('L\'adresse IP de l\'administrateur n\'a pas été configurée: veuillez créer un fichier "admin.php" dans le dossier courant, contenant:<br><br><pre>&lt;?php
- $admin=array("'.$_SERVER['REMOTE_ADDR'].'");
-?&gt;</pre>');
+if(!file_exists('./admin.ini.php')) {
+// MiniVit non configuré
 
-// vérification de l'accès administrateur
-if(in_array($_SERVER['REMOTE_ADDR'], $admin))
- $isadmin = TRUE;
-else $isadmin = FALSE;
+// création utilisateur
+if (!empty($_POST))
+	if(!empty($_POST['username']) && !empty($_POST['password']) && !empty($_POST['email']) ) {
+		$username = (string)$_POST['username'];
+		$password = (string)$_POST['password'];
+		$email = (string)$_POST['email'];
+		$hash = password_hash($password, PASSWORD_DEFAULT, ["cost" => 14]);
+		file_put_contents('./admin.ini.php', '; <?php header("Location: ./"); exit; ?> DO NOT REMOVE THIS LINE'."\n".'[0]'."\n".'user= "'.$username.'"'."\n".'email = "'.$email.'"'."\n".'password = "'.$hash.'"');
+		die('Compte crée. <a href="./">Cliquez ici pour continuer</a>');
+	}
+
+ // formulaire de création du compte
+?>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+</head>
+<body>
+Création du compte administrateur:
+<form action="./" method="post">
+<input type="text" name="username" value="" placeholder="Nom d'utilisateur" required><br>
+<input type="password" name="password" value="" placeholder="Mot de passe" required><br>
+<input type="text" name="email" value="" placeholder="Adresse email" required><br>
+<input type="submit">
+</form>
+</body>
+</html>
+<?php
+die;
+}
+
+// expiration de session
+foreach (glob("*.session") as $filename)
+	if ((time() - filemtime($filename)) > 3600)  // default: 1 hour
+		unlink($filename); 
+
+// contrôle cookie
+if ( file_exists('./'.$_COOKIE["minivit_staySignedIn"].'.session')  )
+	$isadmin = TRUE;
+
+// authentication
+function adminLogin($username, $password) {
+	$ini_array = parse_ini_file('./admin.ini.php');
+	if ($username == $ini_array['user']) {
+		if ( password_verify($password, $ini_array['password']) ) {
+			$sessionstring = '0'.bin2hex(openssl_random_pseudo_bytes(60));
+			file_put_contents($sessionstring.'.session', '');
+			setcookie("minivit_staySignedIn", $sessionstring, 0);
+			return TRUE;
+		}
+		else
+			return FALSE; // mot de passe faux
+	}
+	else
+		return FALSE;  // utilisateur faux
+}
+
+// antibot
+function generate_antibot() {
+    $letters = array('zéro', 'un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf', 'dix', 'onze', 'douze', 'treize', 'quatorze', 'quinze', 'seize', 'dix-sept', 'dix-huit', 'dix-neuf', 'vingt');
+    return $letters[mt_rand(1, 20)];
+}
+
+function check_antibot($number, $text_number) {
+    $letters = array('zéro', 'un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf', 'dix', 'onze', 'douze', 'treize', 'quatorze', 'quinze', 'seize', 'dix-sept', 'dix-huit', 'dix-neuf', 'vingt');
+    return ( array_search( $text_number, $letters ) === intval($number) ) ? true : false;
+}
+
 
 // calcul de l'espace disque utilisé
 
@@ -37,17 +97,6 @@ function poidsfichier($fichier) {
  return $size;
 }
 
-// chiffrement
-$iv=substr(base64_encode(hash('sha256', $admin['0'])), 0, 16);
-
-function email_chiffrement($email, $ip, $iv) {
- return openssl_encrypt($email, 'AES-256-CBC', $ip, FALSE, $iv);
-}
-
-function email_dechiffrement($string, $ip, $iv) {
- return openssl_decrypt($string, 'AES-256-CBC', $ip, FALSE, $iv);
-}
-
 // initialisation de la configuration; valeurs par défaut
 $panneau_admin = FALSE;
 $config=array(
@@ -57,10 +106,7 @@ $config=array(
   'description'=>'Description de la soci&eacute;t&eacute;',
   'license'=>'Tous droits r&eacute;serv&eacute;s',
   'tracking'=>'',
-  'hostingspace'=>'9',
-  'antispam_q'=>'combien font cinq ajout&eacute;s &agrave; trois ?',
-  'antispam_r'=>email_chiffrement('8', $admin['0'], $iv),
-  'email'=>email_chiffrement('aaa@aaa.aa', $admin['0'], $iv)),
+  'hostingspace'=>'9'),
  'style'=>array(
   'body_color'=>'black',
   'body_color_link'=>'brown',
@@ -105,19 +151,26 @@ else {
 
 if(isset($_POST) and !empty($_POST) and $isadmin == TRUE ) {
  foreach($_POST as $key=>$value) {
-   if($key == 'email') { if(isset($config['meta'][$key])) $config['meta'][$key] = email_chiffrement($value, $admin['0'], $iv); }
-   else if($key == 'antispam_r') { if(isset($config['meta'][$key])) $config['meta'][$key] = email_chiffrement($value, $admin['0'], $iv); }
-   else if($key == 'tracking') { if(isset($config['meta'][$key])) $config['meta'][$key] = $value; }
+   if($key == 'tracking') { if(isset($config['meta'][$key])) $config['meta'][$key] = $value; }
    else { if(isset($config['meta'][$key])) $config['meta'][$key] = htmlentities($value, ENT_QUOTES); }
    if(isset($config['style'][$key])) $config['style'][$key] = htmlentities($value, ENT_QUOTES);
    if(isset($config['page'][$key])) $config['page'][$key] = $value;
  }
 
+// nettoyage des anciennes valeurs de config
+if(isset($config['meta']['antispam_q']))
+	unset($config['meta']['antispam_q']);
+if(isset($config['meta']['antispam_r']))
+	unset($config['meta']['antispam_r']);
+if(isset($config['meta']['email']))
+	unset($config['meta']['email']);
 
+// écriture du nouveau fichier de config
 file_put_contents('./data-new.json', json_encode($config), LOCK_EX) or die('Le fichier de configuration n\'a pas pu être écrit. Vérifiez les permissions.');
 }
 
-// changement du fichier de configuration
+// transfert du fichier de configuration
+$ini_array = parse_ini_file('./admin.ini.php');
 if(file_exists('./data-new.json'))
  if(filesize('./data-new.json') > 300) {
   copy('./data.json', './data-prev.json');
@@ -133,12 +186,69 @@ else if(isset($_GET['offres']))
  $page = 'offers';
 else if(isset($_GET['contact']))
  $page = 'contact';
-else if(isset($_GET['admin']) and $isadmin == TRUE) 
- $page = 'admin';
+else if(isset($_GET['admin'])) {
+	if($isadmin == TRUE) 
+		$page = 'admin';
+	else
+		$page = 'login'; 
+}
 else
  $page = 'main';
 
+// ================|
+// panneau de login|
+// ================|
+if($page == 'login') {
+$autherror = ''; 
+	if(!empty($_POST))
+		if (!empty($_POST['username']) and !empty($_POST['password']) ) {
+			$username = (string)$_POST['username'];
+			$password = (string)$_POST['password'];
+			if(adminLogin($username, $password) === TRUE)
+				header('Location: ./?admin');
+			else
+				$autherror = 'Erreur: identifiant ou mot de passe incorrects'; 
+		}
+?>
+<!DOCTYPE html><html><head><meta charset="UTF-8">
+<title>Panneau d'administration</title>
+<meta name="robots" content="noindex, nofollow">
+<style type="text/css">
+div.content {background-color:white;width:50%;margin:1em auto;padding:1em;box-shadow:2px 2px 5px #888888;}
+h1 { background-color:yellow;text-align:center; }
+nav ul li {display:inline-block;margin-bottom:1.2em;}
+nav ul li a {text-decoration:none;padding:0.5em 1em 0.5em 1em;border:1px outset red;font-weight:bold;}
+input[type=text] {width:30em; }
+input[type=text].gestion {width:8em;font-family:monospace; }
+img.gestion {max-width:200px;max-height:200px;border:1px solid;}
+</style>
+<script src="//tinymce.cachefly.net/4.0/tinymce.min.js"></script>
+<script>tinymce.init({ 
+	plugins: "hr link image autoresize charmap table textcolor code",
+	selector:'textarea',
+	toolbar1: "alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link unlink image | preview",
+	toolbar2: "undo redo | styleselect | bold italic underline strikethrough | subscript superscript | forecolor backcolor",
+	tools: "inserttable"});</script>
+</head>
+<body>
+<div class="content">
+<h1>Panneau d'administration</h1>
+<nav>
+ <ul>
+  <li><a href="./">&lArr; Retour au site</a></li>
+ </ul>
+</nav>
+<h2>Connexion</h2>
+<?php echo $autherror; ?>
+<form action="./?admin" method="post">
+<input type="text" name="username" value="" placeholder="Nom d'utilisateur" required><br>
+<input type="password" name="password" value="" placeholder="Mot de passe" required><br>
+<input type="submit">
+</form>
+</body>
+</html>
 
+<?php die; }
 // ========================|
 // panneau d'administration|
 // ========================|
@@ -344,9 +454,6 @@ else {
   echo '<input type="text" name="title" placeholder="Nom de la société" value="'.$config['meta']['title'].'" required><label for="title">Nom de la société</label><br>';
   echo '<input type="text" name="description" placeholder="Description de la société" value="'.$config['meta']['description'].'" required><label for="description">Description de la société</label><br>';
   echo '<input type="text" name="license" placeholder="Licence copyright" value="'.$config['meta']['license'].'" required><label for="license">Licence copyright</label><br>';
-  echo '<input type="text" name="email" placeholder="Adresse email" value="'.email_dechiffrement($config['meta']['email'], $admin['0'], $iv).'" required><label for="email">Adresse email de contact</label><br>';
-  echo '<input type="text" name="antispam_q" placeholder="Antispam: question" value="'.$config['meta']['antispam_q'].'" required><label for="antispam_q">Question pour l\'antispam</label><br>';
-  echo '<input type="text" name="antispam_r" placeholder="Antispam: réponse" value="'.email_dechiffrement($config['meta']['antispam_r'], $admin['0'], $iv).'" required><label for="antispam_r">Réponse de la question</label><br>';
   echo '<input type="text" name="hostingspace" placeholder="Espace web" value="'.$config['meta']['hostingspace'].'" required><label for="hostingspace">Quota d\'espace d\'hébergement (en Mo)</label><br>';
   echo '<input type="text" name="tracking" placeholder="Code de tracking" value="'.htmlentities($config['meta']['tracking'], ENT_QUOTES).'"><label for="tracking">(option) code de tracking</label><br>';
  echo '<input type="submit">';
@@ -379,7 +486,6 @@ article img {border:1px solid;}
 </style>
 </head>
 <body>
-<?php if($isadmin == TRUE) echo '<a style="font-size:small;" href="./?admin">Admin</a>'; ?>
 <div class="content">
 <header>
 <h1><?php echo $config['meta']['title']; ?></h1>
@@ -404,30 +510,32 @@ $nom='';$email='';$texte='';
 if(isset($_POST) and !empty($_POST)) {
  $nom = htmlentities($_POST['nom']);
  $email = htmlentities($_POST['addremail']);
- $check = htmlentities($_POST['abot']);
+
  $texte = $_POST['texte'];
- if($check == email_dechiffrement($config['meta']['antispam_r'], $admin['0'], $iv)) {
+ if(check_antibot($_POST['number'], $_POST['antibot'])) {
  	$headers  = 'MIME-Version: 1.0' . "\r\n";
  	$headers .= 'Content-type: text/plain; charset=UTF-8' . "\r\n";
  	$headers .= "From: $email\r\n";
-   mail(email_dechiffrement($config['meta']['email'], $admin['0'], $iv), '[formulaire de contact site web]', '** adresse IP: '.$_SERVER['REMOTE_ADDR']."\n\n$texte", $headers);
+   mail($ini_array['email'], '[formulaire de contact site web]', '** adresse IP: '.$_SERVER['REMOTE_ADDR']."\n\n$texte", $headers);
    echo '<br><b style="color:darkgreen">Message transmis avec succès.</b><br>Nous vous répondrons dans les meilleurs délais.<br>';
    }
  else echo '<br><b>Une erreur a été détectée.<br>Merci de vérifier votre saisie:</b><br>';
  }
 
+$antibot = generate_antibot();
 echo '<form action="./?contact" method="post">
 <input type="text" name="nom" value="'.$nom.'" size="50%" placeholder="Votre nom" required><br>
 <input type="email" name="addremail" value="'.$email.'" size="50%" placeholder="Votre adresse mail" required><br>
 <textarea name="texte" placeholder="Votre message" rows="10" cols="50%" required>'.$texte.'</textarea><br>
 antispam:<br>
-<input type="text" name="abot" value="" max="1" placeholder="réponse" required><label for="abot"> '.$config['meta']['antispam_q'].'</label><br>
-<input type="submit" value="Envoyer">';
+           <input placeholder="Écrivez « '. $antibot .' » en chiffre" type="text" name="number" size="50%" required><br>
+           <input type="hidden" name="antibot" value="'. $antibot .'" /><br>
+<input type="submit" value="Envoyer"><br><br>';
 }
 echo $config['page'][$page.'_text']; ?>
 </article>
 
-<footer><?php echo '&copy;'.date('Y').' '.$config['meta']['title']; ?> - <?php echo $config['meta']['license'].$config['meta']['tracking']; ?><br><span style="font-size:x-small">site propulsé par <a href="https://github.com/e-leroy/MiniVit">MiniVit</a></span></footer>
+<footer><?php echo '&copy;'.date('Y').' '.$config['meta']['title']; ?> - <?php echo $config['meta']['license'].$config['meta']['tracking']; ?><br><span style="font-size:x-small">site propulsé par <a href="https://github.com/e-leroy/MiniVit">MiniVit</a> ~ <a href="./?admin">admin</a></span></footer>
 </div>
 
 </body>
