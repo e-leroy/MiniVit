@@ -1,4 +1,4 @@
-<?php
+<?php 
 $version=file_get_contents('./version');
 date_default_timezone_set('UTC');
 ini_set('display_errors','0');
@@ -9,14 +9,14 @@ if(!file_exists('./admin.ini.php')) {
 
 // création utilisateur
 if (!empty($_POST))
-if(!empty($_POST['username']) && !empty($_POST['password']) && !empty($_POST['email']) ) {
-$username = (string)$_POST['username'];
-$password = (string)$_POST['password'];
-$email = (string)$_POST['email'];
-$hash = password_hash($password, PASSWORD_DEFAULT, ["cost" => 12]);
-file_put_contents('./admin.ini.php', '; <?php header("Location: ./"); exit; ?> DO NOT REMOVE THIS LINE'."\n".'[0]'."\n".'user= "'.$username.'"'."\n".'email = "'.$email.'"'."\n".'password = "'.$hash.'"');
-die('Compte crée. <a href="./">Cliquez ici pour continuer</a>');
-}
+	if(!empty($_POST['username']) && !empty($_POST['password']) && !empty($_POST['email']) ) {
+		$username = (string)$_POST['username'];
+		$password = (string)$_POST['password'];
+		$email = (string)$_POST['email'];
+		$hash = password_hash($password, PASSWORD_DEFAULT, ["cost" => 12]);
+		file_put_contents('./admin.ini.php', '; <?php header("Location: ./"); exit; ?> DO NOT REMOVE THIS LINE'."\n".'[0]'."\n".'user= "'.$username.'"'."\n".'email = "'.$email.'"'."\n".'password = "'.$hash.'"');
+		die('Compte crée. <a href="./">Cliquez ici pour continuer</a>');
+	}
 
  // formulaire de création du compte
 ?>
@@ -41,29 +41,29 @@ die;
 
 // expiration de session
 foreach (glob("*.session") as $filename)
-if ((time() - filemtime($filename)) > 3600) // default: 1 hour
-unlink($filename);
+	if ((time() - filemtime($filename)) > 3600)  // default: 1 hour
+		unlink($filename); 
 
 // contrôle cookie
-if ( file_exists('./'.$_COOKIE["minivit_staySignedIn"].'.session') )
-$isadmin = TRUE;
+if ( file_exists('./'.$_COOKIE["minivit_staySignedIn"].'.session')  )
+	$isadmin = TRUE;
 
 // authentication
 function adminLogin($username, $password) {
-$ini_array = parse_ini_file('./admin.ini.php');
-if ($username == $ini_array['user']) {
-if ( password_verify($password, $ini_array['password']) ) {
-$sessionstring = '0'.bin2hex(openssl_random_pseudo_bytes(60));
-file_put_contents($sessionstring.'.session', '');
-setcookie("minivit_staySignedIn", $sessionstring, 0);
-return TRUE;
-}
-else
-return FALSE; // mot de passe faux
-}
-else {
-password_verify($password, $ini_array['password']); return FALSE; // utilisateur faux (on fait quand même tourner le check du mot de passe à vide)
-}
+	$ini_array = parse_ini_file('./admin.ini.php');
+	if ($username == $ini_array['user']) {
+		if ( password_verify($password, $ini_array['password']) ) {
+			$sessionstring = '0'.bin2hex(openssl_random_pseudo_bytes(60));
+			file_put_contents($sessionstring.'.session', '');
+			setcookie("minivit_staySignedIn", $sessionstring, 0);
+			return TRUE;
+		}
+		else
+			return FALSE; // mot de passe faux
+	}
+	else {
+		password_verify($password, $ini_array['password']); return FALSE;  // utilisateur faux (on fait quand même tourner le check du mot de passe à vide)
+	}  
 }
 
 // antibot
@@ -134,7 +134,7 @@ if(!file_exists('./data.json'))
  file_put_contents('./data.json', json_encode($config), LOCK_EX) or die('Le fichier de configuration n\'a pas pu être écrit. Vérifiez les permissions.');
 else {
 
- if(json_decode(file_get_contents('./data.json')) === NULL) { // correction de config invalide
+ if(json_decode(file_get_contents('./data.json')) === NULL) {   // correction de config invalide
   copy('./data-prev.json', './data.json'); die('ERREUR: la configuration actuelle est corrompue. Elle a été remplacée par la configuration précédente. <a href="javascript:location.reload();">Cliquer pour recharger la page</a>');
  }
 
@@ -142,7 +142,7 @@ else {
  if(!isset($config_input['meta']['version']) or $config_input['meta']['version'] < $config['meta']['version']) $old = TRUE; // vérification de version de config
  foreach($config_input as $key=>$key2)
   foreach($key2 as $item=>$value)
-   $config[$key][$item] = $value; // récupération des valeurs actuelles
+   $config[$key][$item] = $value;  // récupération des valeurs actuelles
 
  if(isset($old) and $old == TRUE) { $config['meta']['version']=$version; file_put_contents('./data-new.json', json_encode($config), LOCK_EX) or die('Le fichier de configuration n\'a pas pu être écrit. Vérifiez les permissions.'); } // enregistrement de configuration neuve
 }
@@ -159,11 +159,11 @@ if(isset($_POST) and !empty($_POST) and $isadmin == TRUE ) {
 
 // nettoyage des anciennes valeurs de config
 if(isset($config['meta']['antispam_q']))
-unset($config['meta']['antispam_q']);
+	unset($config['meta']['antispam_q']);
 if(isset($config['meta']['antispam_r']))
-unset($config['meta']['antispam_r']);
+	unset($config['meta']['antispam_r']);
 if(isset($config['meta']['email']))
-unset($config['meta']['email']);
+	unset($config['meta']['email']);
 
 // écriture du nouveau fichier de config
 file_put_contents('./data-new.json', json_encode($config), LOCK_EX) or die('Le fichier de configuration n\'a pas pu être écrit. Vérifiez les permissions.');
@@ -187,10 +187,10 @@ else if(isset($_GET['offres']))
 else if(isset($_GET['contact']))
  $page = 'contact';
 else if(isset($_GET['admin'])) {
-if($isadmin == TRUE)
-$page = 'admin';
-else
-$page = 'login';
+	if($isadmin == TRUE) 
+		$page = 'admin';
+	else
+		$page = 'login'; 
 }
 else
  $page = 'main';
@@ -199,16 +199,16 @@ else
 // panneau de login|
 // ================|
 if($page == 'login') {
-$autherror = '';
-if(!empty($_POST))
-if (!empty($_POST['username']) and !empty($_POST['password']) ) {
-$username = (string)$_POST['username'];
-$password = (string)$_POST['password'];
-if(adminLogin($username, $password) === TRUE)
-header('Location: ./?admin');
-else
-$autherror = 'Erreur: identifiant ou mot de passe incorrects';
-}
+$autherror = ''; 
+	if(!empty($_POST))
+		if (!empty($_POST['username']) and !empty($_POST['password']) ) {
+			$username = (string)$_POST['username'];
+			$password = (string)$_POST['password'];
+			if(adminLogin($username, $password) === TRUE)
+				header('Location: ./?admin');
+			else
+				$autherror = 'Erreur: identifiant ou mot de passe incorrects'; 
+		}
 ?>
 <!DOCTYPE html><html><head><meta charset="UTF-8">
 <title>Panneau d'administration</title>
@@ -222,21 +222,20 @@ input[type=text] {width:30em; }
 input[type=text].gestion {width:8em;font-family:monospace; }
 img.gestion {max-width:200px;max-height:200px;border:1px solid;}
 </style>
-<script src="//tinymce.cachefly.net/4.0/tinymce.min.js"></script>
-<script>tinymce.init({
-plugins: "hr link image autoresize charmap table textcolor code",
-selector:'textarea',
-toolbar1: "alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link unlink image | preview",
-toolbar2: "undo redo | styleselect | bold italic underline strikethrough | subscript superscript | forecolor backcolor",
-tools: "inserttable"});</script>
+<script>tinymce.init({ 
+	plugins: "hr link image autoresize charmap table textcolor code",
+	selector:'textarea',
+	toolbar1: "alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link unlink image | preview",
+	toolbar2: "undo redo | styleselect | bold italic underline strikethrough | subscript superscript | forecolor backcolor",
+	tools: "inserttable"});</script>
 </head>
 <body>
 <div class="content">
 <h1>Panneau d'administration</h1>
 <nav>
-<ul>
-<li><a href="./">&lArr; Retour au site</a></li>
-</ul>
+ <ul>
+  <li><a href="./">&lArr; Retour au site</a></li>
+ </ul>
 </nav>
 <h2>Connexion</h2>
 <?php echo $autherror; ?>
@@ -265,32 +264,32 @@ input[type=text].gestion {width:8em;font-family:monospace; }
 img.gestion {max-width:200px;max-height:200px;border:1px solid;}
 </style>
 <script src="//tinymce.cachefly.net/4.0/tinymce.min.js"></script>
-<script>tinymce.init({
-plugins: "hr link image autoresize charmap table textcolor code",
-selector:'textarea',
-toolbar1: "alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link unlink image | preview",
-toolbar2: "undo redo | styleselect | bold italic underline strikethrough | subscript superscript | forecolor backcolor",
-tools: "inserttable"});</script>
+<script>tinymce.init({ 
+	plugins: "hr link image autoresize charmap table textcolor code",
+	selector:'textarea',
+	toolbar1: "alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link unlink image | preview",
+	toolbar2: "undo redo | styleselect | bold italic underline strikethrough | subscript superscript | forecolor backcolor",
+	tools: "inserttable"});</script>
 </head>
 <body>
 <div class="content">
 <h1>Panneau d'administration</h1>
 <nav>
-<ul>
-<li><a href="./">&lArr; Retour au site</a></li>
-<li><a href="./?admin">Informations générales</a></li>
-<li><a href="./?admin=style">Couleurs</a></li>
-<li><a href="./?admin=main">(page1) <?php echo $config['page']['main_title']; ?></a></li>
-<li><a href="./?admin=produits">(page2) <?php echo $config['page']['products_title']; ?></a></li>
-<li><a href="./?admin=offres">(page3) <?php echo $config['page']['offers_title']; ?></a></li>
-<li><a href="./?admin=contact">(page4) <?php echo $config['page']['contact_title']; ?></a></li>
-<li><a href="./?admin=images">Images</a></li>
-<li><a href="./?admin=maintenance">Maintenance</a></li>
-</ul>
+ <ul>
+  <li><a href="./">&lArr; Retour au site</a></li>
+  <li><a href="./?admin">Informations générales</a></li>
+  <li><a href="./?admin=style">Couleurs</a></li>
+  <li><a href="./?admin=main">(page1) <?php echo $config['page']['main_title']; ?></a></li>
+  <li><a href="./?admin=produits">(page2) <?php echo $config['page']['products_title']; ?></a></li>
+  <li><a href="./?admin=offres">(page3) <?php echo $config['page']['offers_title']; ?></a></li>
+  <li><a href="./?admin=contact">(page4) <?php echo $config['page']['contact_title']; ?></a></li>
+  <li><a href="./?admin=images">Images</a></li>
+  <li><a href="./?admin=maintenance">Maintenance</a></li>
+ </ul>
 </nav>
 <?php
-if($_GET['admin'] == 'style') {
-  echo '<h2>Couleurs du site</h2><form action="./?admin=style" method="post">';
+if($_GET['admin'] == 'style') { 
+  echo '<h2>Couleurs du site</h2><form action="./?admin=style"  method="post">';
   echo '<select name="body_color" onchange="changecolor(\'body_color\', value)">';
   foreach($couleurs as $couleur) {
    if($config['style']['body_color'] == $couleur)
@@ -328,17 +327,17 @@ echo '
  echo '<br><input type="submit">';
 echo '<script type="text/javascript">
 function changecolor(id, couleur){
-document.getElementById(id).style.color = couleur;
+  document.getElementById(id).style.color = couleur;
 }
 function changebgcolor(id, couleur){
-document.getElementById(id).style.backgroundColor = couleur;
+  document.getElementById(id).style.backgroundColor = couleur;
 }
 </script>';
  if(!empty($_POST)) echo '<br><br><i style="color:green;">Données enregistrées avec succès. <a href="./">Retour au site</a></i>';
 }
 else if($_GET['admin'] == 'main') {
    echo '<h2>Page 1: "'.$config['page']['main_title'].'"</h2>';
-echo '<form action="./?admin=main" method="post">';
+echo '<form action="./?admin=main"  method="post">';
   echo '<label for="main_title">Titre de la page</label><br><input type="text" name="main_title" placeholder="Titre de la page" value="'.$config['page']['main_title'].'" required><br><br>';
   echo '<label for="main_text"> Contenu de la page</label><br><textarea name="main_text">'.$config['page']['main_text'].'</textarea><br>';
  echo '<input type="submit">';
@@ -347,7 +346,7 @@ echo '<form action="./?admin=main" method="post">';
 }
 else if($_GET['admin'] == 'produits') {
    echo '<h2>Page 2: "'.$config['page']['products_title'].'"</h2>';
-echo '<form action="./?admin=produits" method="post">';
+echo '<form action="./?admin=produits"  method="post">';
   echo '<label for="products_title">Titre de la page</label><br><input type="text" name="products_title" placeholder="Titre de la page" value="'.$config['page']['products_title'].'" required><br><br>';
   echo '<label for="products_text"> Contenu de la page</label><br><textarea name="products_text">'.$config['page']['products_text'].'</textarea><br>';
  echo '<input type="submit">';
@@ -356,7 +355,7 @@ echo '<form action="./?admin=produits" method="post">';
 }
 else if($_GET['admin'] == 'offres') {
    echo '<h2>Page 3: "'.$config['page']['offers_title'].'"</h2>';
-echo '<form action="./?admin=offres" method="post">';
+echo '<form action="./?admin=offres"  method="post">';
   echo '<label for="offers_title">Titre de la page</label><br><input type="text" name="offers_title" placeholder="Titre de la page" value="'.$config['page']['offers_title'].'" required><br><br>';
   echo '<label for="offers_text"> Contenu de la page</label><br><textarea name="offers_text">'.$config['page']['offers_text'].'</textarea><br>';
  echo '<input type="submit">';
@@ -365,27 +364,27 @@ echo '<form action="./?admin=offres" method="post">';
 }
 else if($_GET['admin'] == 'contact') {
    echo '<h2>Page 4: "'.$config['page']['contact_title'].'"</h2>';
-echo '<form action="./?admin=contact" method="post">';
+echo '<form action="./?admin=contact"  method="post">';
   echo '<label for="contact_title">Titre de la page</label><br><input type="text" name="contact_title" placeholder="Titre de la page" value="'.$config['page']['contact_title'].'" required><br><br>';
   echo '<label for="contact_text"> Contenu de la page</label><br><textarea name="contact_text">'.$config['page']['contact_text'].'</textarea><br>';
  echo '<input type="submit">';
 
  if(!empty($_POST)) echo '<br><br><i style="color:green;">Données enregistrées avec succès. <a href="./">Retour au site</a></i>';
 }
-else if($_GET['admin'] == 'images') {
+else if($_GET['admin'] == 'images') { 
   if(isset($_GET['del'])) // suppression d'image
    unlink($_GET['del'].'.png');
 
 // formulaire d'envoi d'images
    echo '<h2>Gestionnaire d\'images</h2>';
-   echo 'Espace disque utilisé: <b>'.espaceutilise().' Mo</b> ('.espaceutilise($config['meta']['hostingspace']).' % du quota)<br>';
+   echo 'Espace disque utilisé: <b>'.espaceutilise().' Mo</b>  ('.espaceutilise($config['meta']['hostingspace']).' % du quota)<br>';
 if(espaceutilise($config['meta']['hostingspace']) > 80) echo '<b style="color:yellow;background-color:black">AVERTISSEMENT: '.espaceutilise($config['meta']['hostingspace']).' %</b><br><b style="color:red">Il y a peu ou pas d\'espace d\'hébergement libre. Veuillez supprimer des images non utilisées, ou utiliser un hébergement avec quota supérieur. Il est déconseillé d\'ajouter de nouvelles images actuellement.</b><br>';
   echo '<br>Ajouter une image: (format JPG ou PNG, poids maximum: 1 Mo)<br>
-<form method="post" action="./?admin=images" enctype="multipart/form-data">
-<input type="hidden" name="MAX_FILE_SIZE" value="1048576">
-<input type="file" name="image">
-<input type="submit">
-</form><br><br>';
+   <form method="post" action="./?admin=images" enctype="multipart/form-data">
+   <input type="hidden" name="MAX_FILE_SIZE" value="1048576">
+   <input type="file" name="image">
+   <input type="submit">
+   </form><br><br>';
 $erreur=array();
 
 
@@ -401,20 +400,20 @@ $erreur=array();
    $nouveaunom = hash_file('crc32', $nom).'.png';
    rename($nom, $nouveaunom);
    if(imagecreatefrompng($nouveaunom)) { } else { unlink($nouveaunom); if(empty($erreur)) { $erreur[] = "Format de fichier invalide";} }
-   if(filesize($nouveaunom) > 1048576) { $size = poidsfichier($nouveaunom); unlink($nouveaunom); $erreur[] = "Fichier trop lourd après conversion: $size Mo"; }
+   if(filesize($nouveaunom) > 1048576) { $size = poidsfichier($nouveaunom);  unlink($nouveaunom); $erreur[] = "Fichier trop lourd après conversion: $size Mo"; }
   }
 
   if(!empty($erreur))
-   { echo '<b style="color:red">Une erreur est survenue:</b><br>'; foreach($erreur as $message) echo $message.'<br>';echo '<br><br>'; }
+   { echo '<b style="color:red">Une erreur est survenue:</b><br>'; foreach($erreur as $message) echo $message.'<br>';echo '<br><br>';  }
   if(!empty($_FILES) and empty($erreur)) echo '<b style="color:green">Envoi réussi: '.$nouveaunom.'</b><br><br>';
 
-// listing des images
+// listing des images 
   echo 'Pour insérer une image dans une page, cliquez sur son identifiant (par ex: "c24e5f6b.png") et copiez-collez l\'identifiant dans le panneau d\'édition.<br>';
   foreach (glob("*.png") as $filename) {
     $id = substr($filename, 0, 8);
     echo '<a href="'.$filename.'"><img class="gestion" alt="" src="'.$filename.'"></a> <a style="color:red;text-decoration:none;" title="Supprimer cette image" href="javascript:if(confirm(\'Supprimer cette image ?\')) document.location.href=\'./?admin=images&del='.$id.'\';">X</a><br><input title="Cliquer pour sélectionner cette image" class="gestion" type="text" value="'.hash_file('crc32', $filename).'.png" onclick="select()"> <b>'.poidsfichier($filename).' Mo</b><br><br>';
   }
-}
+} 
 
 // page de maintenance
 else if($_GET['admin'] == 'maintenance') {
@@ -423,14 +422,14 @@ else if($_GET['admin'] == 'maintenance') {
    if($checknewversion > $version) $newversion='<br><a href="https://github.com/e-leroy/MiniVit">une mise à jour est disponible: '.$checknewversion.'</a>';
    echo '<pre>Version du gestionnaire: '.$version.$newversion.'<br>';
    echo 'Dernière modification de la configuration: '.date('d/m/Y H:i (e)', filemtime('./data.json')).'<br>';
-   echo 'Espace disque utilisé: <b>'.espaceutilise().' Mo</b> ('.espaceutilise($config['meta']['hostingspace']).' % du quota)<br>';
-  echo '</pre><br><br><b><a href="./data.json">Sauvegarder la configuration</a></b> (clic droit > "Enregistrer la cible du lien sous...")';
+   echo 'Espace disque utilisé: <b>'.espaceutilise().' Mo</b>  ('.espaceutilise($config['meta']['hostingspace']).' % du quota)<br>';
+  echo '</pre><br><br><b><a href="./data.json">Sauvegarder la configuration</a></b>  (clic droit > "Enregistrer la cible du lien sous...")';
   echo '<br><br><b>Restaurer un fichier de configuration</b><br>
-<form method="post" action="./?admin=maintenance" enctype="multipart/form-data">
-<input type="hidden" name="MAX_FILE_SIZE" value="1048576">
-<input type="file" name="config">
-<input type="submit">
-</form><br><br>';
+   <form method="post" action="./?admin=maintenance" enctype="multipart/form-data">
+   <input type="hidden" name="MAX_FILE_SIZE" value="1048576">
+   <input type="file" name="config">
+   <input type="submit">
+   </form><br><br>';
 // restauration de configuration
   if(!empty($_FILES)) {
    if ($_FILES['image']['error'] == 1) $erreur[] = "Limite d'envoi du serveur dépassée";
@@ -452,7 +451,7 @@ else if($_GET['admin'] == 'maintenance') {
 
 // informations générales
 else {
- echo '<h2>Informations générales</h2><form action="./?admin" method="post">';
+ echo '<h2>Informations générales</h2><form action="./?admin"  method="post">';
   echo '<input type="text" name="title" placeholder="Nom de la société" value="'.$config['meta']['title'].'" required><label for="title">Nom de la société</label><br>';
   echo '<input type="text" name="description" placeholder="Description de la société" value="'.$config['meta']['description'].'" required><label for="description">Description de la société</label><br>';
   echo '<input type="text" name="license" placeholder="Licence copyright" value="'.$config['meta']['license'].'" required><label for="license">Licence copyright</label><br>';
@@ -466,7 +465,7 @@ else {
 </div>
 </body></html>
 
-<?php } else { /* affichage des pages publiques */ ?>
+<?php } else { /* affichage des pages publiques  */ ?>
 
 <!DOCTYPE html>
 <html>
@@ -493,12 +492,12 @@ article img {border:1px solid;}
 <h1><?php echo $config['meta']['title']; ?></h1>
 <h2><?php echo $config['meta']['description']; ?></h2>
 <nav>
-<ul>
-<li><a href="./"><?php echo $config['page']['main_title']; ?></a></li>
-<li><a href="./?produits"><?php echo $config['page']['products_title']; ?></a></li>
-<li><a href="./?offres"><?php echo $config['page']['offers_title']; ?></a></li>
-<li><a href="./?contact"><?php echo $config['page']['contact_title']; ?></a></li>
-</ul>
+ <ul>
+  <li><a href="./"><?php echo $config['page']['main_title']; ?></a></li>
+  <li><a href="./?produits"><?php echo $config['page']['products_title']; ?></a></li>
+  <li><a href="./?offres"><?php echo $config['page']['offers_title']; ?></a></li>
+  <li><a href="./?contact"><?php echo $config['page']['contact_title']; ?></a></li>
+ </ul>
 </nav>
 </header>
 
@@ -515,9 +514,9 @@ if(isset($_POST) and !empty($_POST)) {
 
  $texte = $_POST['texte'];
  if(check_antibot($_POST['number'], $_POST['antibot'])) {
-  $headers = 'MIME-Version: 1.0' . "\r\n";
-  $headers .= 'Content-type: text/plain; charset=UTF-8' . "\r\n";
-  $headers .= "From: $email\r\n";
+ 	$headers  = 'MIME-Version: 1.0' . "\r\n";
+ 	$headers .= 'Content-type: text/plain; charset=UTF-8' . "\r\n";
+ 	$headers .= "From: $email\r\n";
    mail($ini_array['email'], '[formulaire de contact site web]', '** adresse IP: '.$_SERVER['REMOTE_ADDR']."\n\n$texte", $headers);
    echo '<br><b style="color:darkgreen">Message transmis avec succès.</b><br>Nous vous répondrons dans les meilleurs délais.<br>';
    }
@@ -530,8 +529,8 @@ echo '<form action="./?contact" method="post">
 <input type="email" name="addremail" value="'.$email.'" size="50%" placeholder="Votre adresse mail" required><br>
 <textarea name="texte" placeholder="Votre message" rows="10" cols="50%" required>'.$texte.'</textarea><br>
 antispam:<br>
-<input placeholder="Écrivez « '. $antibot .' » en chiffre" type="text" name="number" size="50%" required><br>
-<input type="hidden" name="antibot" value="'. $antibot .'" /><br>
+           <input placeholder="Écrivez « '. $antibot .' » en chiffre" type="text" name="number" size="50%" required><br>
+           <input type="hidden" name="antibot" value="'. $antibot .'" /><br>
 <input type="submit" value="Envoyer"><br><br>';
 }
 echo $config['page'][$page.'_text']; ?>
