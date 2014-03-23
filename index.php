@@ -222,7 +222,6 @@ input[type=text] {width:30em; }
 input[type=text].gestion {width:8em;font-family:monospace; }
 img.gestion {max-width:200px;max-height:200px;border:1px solid;}
 </style>
-<script src="//tinymce.cachefly.net/4.0/tinymce.min.js"></script>
 <script>tinymce.init({ 
 	plugins: "hr link image autoresize charmap table textcolor code",
 	selector:'textarea',
@@ -252,7 +251,16 @@ img.gestion {max-width:200px;max-height:200px;border:1px solid;}
 // ========================|
 // panneau d'administration|
 // ========================|
-if($page == 'admin') { ?>
+if($page == 'admin') { 
+	$resCacheExpire = time() - 2592000 ; // 30 jours
+	if (file_exists('tinymce.min.js') && filemtime('tinymce.min.js') < $resCacheExpire) {
+		unlink('tinymce.min.js');
+	}
+	if (!file_exists('tinymce.min.js')) {
+		copy('http://tinymce.cachefly.net/4.0/tinymce.min.js', 'tinymce.min.js')
+	}
+	
+?>
 <!DOCTYPE html><html><head><meta charset="UTF-8">
 <title>Panneau d'administration</title>
 <style type="text/css">
@@ -264,7 +272,7 @@ input[type=text] {width:30em; }
 input[type=text].gestion {width:8em;font-family:monospace; }
 img.gestion {max-width:200px;max-height:200px;border:1px solid;}
 </style>
-<script src="//tinymce.cachefly.net/4.0/tinymce.min.js"></script>
+<script src="tinymce.min.js"></script>
 <script>tinymce.init({ 
 	plugins: "hr link image autoresize charmap table textcolor code",
 	selector:'textarea',
@@ -530,7 +538,7 @@ echo '<form action="./?contact" method="post">
 <input type="email" name="addremail" value="'.$email.'" size="50%" placeholder="Votre adresse mail" required><br>
 <textarea name="texte" placeholder="Votre message" rows="10" cols="50%" required>'.$texte.'</textarea><br>
 antispam:<br>
-           <input placeholder="Écrivez « '. $antibot .' » en chiffre" type="text" name="number" size="50%" required><br>
+           <input placeholder="Écrivez « '. $antibot .' » en chiffre" type="text" name="number" size="50%" required><br>
            <input type="hidden" name="antibot" value="'. $antibot .'" /><br>
 <input type="submit" value="Envoyer"><br><br>';
 }
