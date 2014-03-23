@@ -257,7 +257,7 @@ if($page == 'admin') {
 		unlink('tinymce.min.js');
 	}
 	if (!file_exists('tinymce.min.js')) {
-		copy('http://tinymce.cachefly.net/4.0/tinymce.min.js', 'tinymce.min.js')
+		copy('http://tinymce.cachefly.net/4.0/tinymce.min.js', 'tinymce.min.js');
 	}
 	
 ?>
