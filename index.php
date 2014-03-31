@@ -214,7 +214,7 @@ $autherror = '';
 <title>Panneau d'administration</title>
 <meta name="robots" content="noindex, nofollow">
 <style type="text/css">
-div.content {background-color:white;width:50%;margin:1em auto;padding:1em;box-shadow:2px 2px 5px #888888;}
+div.content {background-color:white;max-width:75%;min-width:50em;margin:1em auto;padding:1em;box-shadow:2px 2px 5px #888888;}
 h1 { background-color:yellow;text-align:center; }
 nav ul li {display:inline-block;margin-bottom:1.2em;}
 nav ul li a {text-decoration:none;padding:0.5em 1em 0.5em 1em;border:1px outset red;font-weight:bold;}
@@ -255,7 +255,7 @@ if($page == 'admin') { ?>
 <!DOCTYPE html><html><head><meta charset="UTF-8">
 <title>Panneau d'administration</title>
 <style type="text/css">
-div.content {background-color:white;width:50%;margin:1em auto;padding:1em;box-shadow:2px 2px 5px #888888;}
+div.content {background-color:white;max-width:75%;min-width:50em;margin:1em auto;padding:1em;box-shadow:2px 2px 5px #888888;}
 h1 { background-color:yellow;text-align:center; }
 nav ul li {display:inline-block;margin-bottom:1.2em;}
 nav ul li a {text-decoration:none;padding:0.5em 1em 0.5em 1em;border:1px outset red;font-weight:bold;}
@@ -478,7 +478,7 @@ else {
 body {color:<?php echo $config['style']['body_color']; ?>;font-family:sans-serif;text-align:justify;background:linear-gradient(to bottom, <?php echo $config['style']['body_backgroundcolor1']; ?>, <?php echo $config['style']['body_backgroundcolor2']; ?>);filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='<?php echo $config['style']['body_backgroundcolor1']; ?>', endColorstr='<?php echo $config['style']['body_backgroundcolor2']; ?>');<?php if(!empty($config['style']['body_backgroundimage']) and file_exists($config['style']['body_backgroundimage'])) echo 'background-image: url("'.$config['style']['body_backgroundimage'].'");background-repeat: no-repeat;background-position:top center;'; ?> background-attachment:fixed;}
 a {color:<?php echo $config['style']['body_color_link']; ?>;font-weight:bold;}
 a:hover {color:<?php echo $config['style']['body_color_link_hover']; ?>;}
-div.content {background-color:white;width:50%;min-width:35em;margin:1em auto;padding:1em;box-shadow:2px 2px 5px #888888;border-radius:15px;} nav ul li a {text-decoration:none;padding:0.5em 1em 0.5em 1em;border:1px outset #bbb;border-radius:5px;}
+div.content {background-color:white;max-width:75%;min-width:50em;margin:1em auto;padding:1em;box-shadow:2px 2px 5px #888888;border-radius:15px;} nav ul li a {text-decoration:none;padding:0.5em 1em 0.5em 1em;border:1px outset #bbb;border-radius:5px;}
 footer {text-align:center;font-size:small;}
 header h1,h2 {text-align:center;}
 nav ul li {display:inline-block;margin-bottom:1.2em;}
