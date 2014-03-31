@@ -473,7 +473,7 @@ else {
 <meta charset="UTF-8">
 <title><?php echo $config['meta']['title'].' | '.$config['page'][$page.'_title']; ?></title>
 <meta name="description" content="<?php echo $config['meta']['description']; ?>">
-<meta name="viewport" content="initial-scale=1.0, user-scalable=yes">
+<meta name="viewport" content="viuser-scalable=yes">
 <style type="text/css">
 body {color:<?php echo $config['style']['body_color']; ?>;font-family:sans-serif;text-align:justify;background:linear-gradient(to bottom, <?php echo $config['style']['body_backgroundcolor1']; ?>, <?php echo $config['style']['body_backgroundcolor2']; ?>);filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='<?php echo $config['style']['body_backgroundcolor1']; ?>', endColorstr='<?php echo $config['style']['body_backgroundcolor2']; ?>');<?php if(!empty($config['style']['body_backgroundimage']) and file_exists($config['style']['body_backgroundimage'])) echo 'background-image: url("'.$config['style']['body_backgroundimage'].'");background-repeat: no-repeat;background-position:top center;'; ?> background-attachment:fixed;}
 a {color:<?php echo $config['style']['body_color_link']; ?>;font-weight:bold;}
