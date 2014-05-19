@@ -1,17 +1,14 @@
 MiniVit
 =======
 
-Gestionnaire de site-vitrine ultra-minimaliste
+Gestionnaire de site-vitrine ultra-rapide
 
-Ultra-minimalist "vitrine" website manager
+Ultra-fast "vitrine" website manager
 
 `[ FR ]`
 
 Développé par Emmanuel LEROY et [RTS INFORMATIQUE](http://www.rts-informatique.fr/)
 
-Instances MiniVit existantes:
-- [RTS INFORMATIQUE](http://www.rts-informatique.fr/)
-- [Garage KUHN SAS Haguenau](http://www.garagekuhn.com/)
 
 Licence
 ===================
