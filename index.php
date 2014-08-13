@@ -15,7 +15,7 @@ if (!empty($_POST))
 		$email = (string)$_POST['email'];
 		$hash = password_hash($password, PASSWORD_DEFAULT, ["cost" => 12]);
 		file_put_contents('./admin.ini.php', '; <?php header("Location: ./"); exit; ?> DO NOT REMOVE THIS LINE'."\n".'[0]'."\n".'user= "'.$username.'"'."\n".'email = "'.$email.'"'."\n".'password = "'.$hash.'"');
-		die('Compte crée. <a href="./">Cliquez ici pour continuer</a>');
+		die('Compte cr&eacute;e. <a href="./">Cliquez ici pour continuer</a>');
 	}
 
  // formulaire de création du compte
@@ -26,11 +26,12 @@ if (!empty($_POST))
 <meta charset="UTF-8">
 </head>
 <body>
-Création du compte administrateur:
+<h1>Bienvenue sur MiniVit !</h1>
+Pour commencer, merci de créer le compte administrateur:
 <form action="./" method="post">
 <input type="text" name="username" value="" placeholder="Nom d'utilisateur" required><br>
 <input type="password" name="password" value="" placeholder="Mot de passe" required><br>
-<input type="text" name="email" value="" placeholder="Adresse email" required><br>
+<input type="email" name="email" value="" placeholder="Adresse email" required><br>
 <input type="submit">
 </form>
 </body>
@@ -113,7 +114,9 @@ $config=array(
   'body_color_link_hover'=>'red',
   'body_backgroundcolor1'=>'white',
   'body_backgroundcolor2'=>'lightgrey',
-  'body_backgroundimage'=>''),
+  'body_backgroundimage'=>'',
+  'body_imageborder'=>'0',
+  'body_imageborder_color'=>'black'),
  'page'=>array(
   'main_title'=>'La soci&eacute;t&eacute;',
   'main_text'=>'(pr&eacute;sentation de la soci&eacute;t&eacute;)',
@@ -153,7 +156,15 @@ if(isset($_POST) and !empty($_POST) and $isadmin == TRUE ) {
  foreach($_POST as $key=>$value) {
    if($key == 'tracking') { if(isset($config['meta'][$key])) $config['meta'][$key] = $value; }
    else { if(isset($config['meta'][$key])) $config['meta'][$key] = htmlentities($value, ENT_QUOTES); }
-   if(isset($config['style'][$key])) $config['style'][$key] = htmlentities($value, ENT_QUOTES);
+   if(isset($config['style'][$key])) {
+	if($key == 'body_imageborder') {
+		$value = (int)preg_replace("/[^0-3]/", '', $value);
+		if(empty($value)) { $value=0; }
+		$config['style'][$key] = $value;
+	}
+	else
+	 $config['style'][$key] = htmlentities($value, ENT_QUOTES);
+   }
    if(isset($config['page'][$key])) $config['page'][$key] = $value;
  }
 
@@ -303,7 +314,13 @@ if($_GET['admin'] == 'style') {
 
   echo '<select name="body_color_link" onchange="changecolor(\'body_color_link\', value)">';foreach($couleurs as $couleur) {if($config['style']['body_color_link'] == $couleur) echo '<option style="color:'.$couleur.';" value="'.$couleur.'" selected>'.$couleur.'</option>'; else echo '<option style="color:'.$couleur.';" value="'.$couleur.'">'.$couleur.'</option>';} echo '</select>'; echo '<label for="body_color_link"> liens (texte): <span id="body_color_link" style="color:'.$config['style']['body_color_link'].';background-color:white;font-weight:bold;">&nbsp;Cliquez ici pour nous contacter !&nbsp;</span></label><br>';
 
-  echo '<select name="body_color_link_hover" onchange="changecolor(\'body_color_link_hover\', value)">';foreach($couleurs as $couleur) {if($config['style']['body_color_link_hover'] == $couleur) echo '<option style="color:'.$couleur.';" value="'.$couleur.'" selected>'.$couleur.'</option>'; else echo '<option style="color:'.$couleur.';" value="'.$couleur.'">'.$couleur.'</option>';} echo '</select>'; echo '<label for="body_color_link_hover"> liens au passage de la souris: <span id="body_color_link_hover" style="color:'.$config['style']['body_color_link_hover'].';background-color:white;font-weight:bold;">&nbsp;Cliquez ici pour nous contacter !&nbsp;</span></label><br><br>';
+  echo '<select name="body_color_link_hover" onchange="changecolor(\'body_color_link_hover\', value)">';foreach($couleurs as $couleur) {if($config['style']['body_color_link_hover'] == $couleur) echo '<option style="color:'.$couleur.';" value="'.$couleur.'" selected>'.$couleur.'</option>'; else echo '<option style="color:'.$couleur.';" value="'.$couleur.'">'.$couleur.'</option>';} echo '</select>'; echo '<label for="body_color_link_hover"> liens au passage de la souris: <span id="body_color_link_hover" style="color:'.$config['style']['body_color_link_hover'].';background-color:white;font-weight:bold;">&nbsp;Cliquez ici pour nous contacter !&nbsp;</span></label><br>';
+
+$body_imageborder=0; if($config["style"]["body_imageborder"]) {$body_imageborder = $config["style"]["body_imageborder"];}
+  echo '<input type="number" min="0" max="3" name="body_imageborder" value="'.$body_imageborder.'">';
+echo '<select name="body_imageborder_color" onchange="changeborcolor(\'body_imageborder_color\', value)">';foreach($couleurs as $couleur) {if($config['style']['body_imageborder_color'] == $couleur) echo '<option style="color:'.$couleur.';" value="'.$couleur.'" selected>'.$couleur.'</option>'; else echo '<option style="color:'.$couleur.';" value="'.$couleur.'">'.$couleur.'</option>';} echo '</select>';
+
+echo '<label for="body_imageborder">Bordure des images (0-3 pixels): <img id="body_imageborder_color" style="border: '.$body_imageborder.'px solid '.$config['style']['body_imageborder_color'].'" alt="test" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAZAQMAAABJmu8HAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAGUExURf78+79iP3nzcGkAAABYSURBVAjXY2AgEdgzyDHwH2BgMH/wi8H3BwMD488D8gfqgHRng31DEpBubDBgSADR+6D0BwsI3SDvAKH5H0BoBhidAKZboPQ/gwNg+oEtiGZgZOBvIOwsAINtHyyE9L2uAAAAAElFTkSuQmCC"></label> <br><br>';
 
   echo '<select name="body_backgroundcolor1" onchange="changebgcolor(\'body_backgroundcolor1\', value)">';foreach($couleurs as $couleur) {if($config['style']['body_backgroundcolor1'] == $couleur) echo '<option style="color:'.$couleur.';" value="'.$couleur.'" selected>'.$couleur.'</option>'; else echo '<option style="color:'.$couleur.';" value="'.$couleur.'">'.$couleur.'</option>';} echo '</select>'; echo '<label for="body_backgroundcolor1"> couleur de fond (haut): <span id="body_backgroundcolor1" style="border:1px solid;background-color:'.$config['style']['body_backgroundcolor1'].';">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></label><br>';
   echo '<select name="body_backgroundcolor2" onchange="changebgcolor(\'body_backgroundcolor2\', value)">';foreach($couleurs as $couleur) {if($config['style']['body_backgroundcolor2'] == $couleur) echo '<option style="color:'.$couleur.';" value="'.$couleur.'" selected>'.$couleur.'</option>'; else echo '<option style="color:'.$couleur.';" value="'.$couleur.'">'.$couleur.'</option>';} echo '</select>'; echo '<label for="body_backgroundcolor2"> couleur de fond (bas) : <span id="body_backgroundcolor2" style="border:1px solid;background-color:'.$config['style']['body_backgroundcolor2'].';">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></label><br><br>';
@@ -331,6 +348,9 @@ function changecolor(id, couleur){
 }
 function changebgcolor(id, couleur){
   document.getElementById(id).style.backgroundColor = couleur;
+}
+function changeborcolor(id, couleur){
+  document.getElementById(id).style.borderColor = couleur;
 }
 </script>';
  if(!empty($_POST)) echo '<br><br><i style="color:green;">Données enregistrées avec succès. <a href="./">Retour au site</a></i>';
@@ -483,7 +503,7 @@ footer {text-align:center;font-size:small;}
 header h1,h2 {text-align:center;}
 nav ul li {display:inline-block;margin-bottom:1.2em;}
 article h1 {margin-left:1em;}
-article img {border:1px solid;}
+article img {border:<?php echo $config['style']['body_imageborder']; ?>px solid <?php echo $config['style']['body_imageborder_color']; ?>;}
 </style>
 </head>
 <body>
