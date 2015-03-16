@@ -239,6 +239,7 @@ img.gestion {max-width:200px;max-height:200px;border:1px solid;}
 	toolbar1: "alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link unlink image | preview",
 	toolbar2: "undo redo | styleselect | bold italic underline strikethrough | subscript superscript | forecolor backcolor",
 	tools: "inserttable"});</script>
+<link href="favicon.png" rel="icon" type="image/png">
 </head>
 <body>
 <div class="content">
@@ -255,6 +256,7 @@ img.gestion {max-width:200px;max-height:200px;border:1px solid;}
 <input type="password" name="password" value="" placeholder="Mot de passe" required><br>
 <input type="submit">
 </form>
+
 </body>
 </html>
 
@@ -281,6 +283,7 @@ img.gestion {max-width:200px;max-height:200px;border:1px solid;}
 	toolbar1: "alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link unlink image | preview",
 	toolbar2: "undo redo | styleselect | bold italic underline strikethrough | subscript superscript | forecolor backcolor",
 	tools: "inserttable"});</script>
+<link href="favicon.png" rel="icon" type="image/png">
 </head>
 <body>
 <div class="content">
@@ -505,6 +508,7 @@ nav ul li {display:inline-block;margin-bottom:1.2em;}
 article h1 {margin-left:1em;}
 article img {border:<?php echo $config['style']['body_imageborder']; ?>px solid <?php echo $config['style']['body_imageborder_color']; ?>;}
 </style>
+<link href="favicon.png" rel="icon" type="image/png">
 </head>
 <body>
 <div class="content">
