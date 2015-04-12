@@ -53,6 +53,7 @@ if ( file_exists('./'.$_COOKIE["minivit_staySignedIn"].$iphash.'.session')  )
 // authentication
 function adminLogin($username, $password) {
 	$ini_array = parse_ini_file('./admin.ini.php');
+	$iphash=md5($_SERVER['REMOTE_ADDR']);
 	if ($username == $ini_array['user']) {
 		if ( password_verify($password, $ini_array['password']) ) {
 			$sessionstring = '0'.bin2hex(openssl_random_pseudo_bytes(60));
