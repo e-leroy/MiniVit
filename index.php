@@ -46,7 +46,8 @@ foreach (glob("*.session") as $filename)
 		unlink($filename); 
 
 // contrôle cookie
-if ( file_exists('./'.$_COOKIE["minivit_staySignedIn"].'.session')  )
+$iphash=md5($_SERVER['REMOTE_ADDR']);
+if ( file_exists('./'.$_COOKIE["minivit_staySignedIn"].$iphash.'.session')  )
 	$isadmin = TRUE;
 
 // authentication
@@ -55,7 +56,7 @@ function adminLogin($username, $password) {
 	if ($username == $ini_array['user']) {
 		if ( password_verify($password, $ini_array['password']) ) {
 			$sessionstring = '0'.bin2hex(openssl_random_pseudo_bytes(60));
-			file_put_contents($sessionstring.'.session', '');
+			file_put_contents($sessionstring.$iphash.'.session', '');
 			setcookie("minivit_staySignedIn", $sessionstring, 0);
 			return TRUE;
 		}
@@ -63,7 +64,7 @@ function adminLogin($username, $password) {
 			return FALSE; // mot de passe faux
 	}
 	else {
-		password_verify($password, $ini_array['password']); return FALSE;  // utilisateur faux (on fait quand même tourner le check du mot de passe à vide)
+		sleep(1); return FALSE;  // utilisateur faux
 	}  
 }
 
