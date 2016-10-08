@@ -7,7 +7,7 @@ Ultra-fast "vitrine" website manager
 
 `[ FR ]`
 
-Développé par Emmanuel LEROY et [RTS INFORMATIQUE](http://www.rts-informatique.fr/)
+Développé par Emmanuel LEROY pour RTS INFORMATIQUE
 
 
 Licence
@@ -24,7 +24,7 @@ Pré-requis et installation
 Envoyez les fichiers par FTP, SFTP ou tout autre moyen
 
 > Alternative avec git:
-- git clone https://github.com/rtsinfo/MiniVit .
+- git clone https://github.com/e-leroy/MiniVit .
 
 - si le fichier `admin.ini.php` n'existe pas, le script vous proposera de créer le compte admin
 - une fois le fichier `admin.ini.php` généré, le site par défaut s'affiche
